@@ -19,7 +19,7 @@ spec:
           CLUSTER_NAME:
             value: "<CLUSTER_NAME>"
           HOSTED_ZONE_NAME:
-            value: "<AWS_HOSTED_ZONE_NAME>"
+            value: "<LOCAL_DNS>"
           GITHUB_HOST:
             value: "<GITHUB_HOST>"
           GITHUB_OWNER:
