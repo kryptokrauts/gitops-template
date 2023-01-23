@@ -23,10 +23,6 @@ path "secret/*" {
     capabilities = ["create", "read", "update", "delete", "list"]
 }
 
-path "aws/*" {
-    capabilities = ["create", "read", "update", "delete", "list"]
-}
-
 # Allow default access to secret
 path "avp/*" {
     capabilities = ["create", "read", "update", "delete", "list"]
@@ -148,10 +144,6 @@ resource "vault_policy" "developer" {
 # Obviously it's your vault now, feel free to change the rules
 path "secret/*" {
     capabilities = ["create", "read", "update", "list"]
-}
-
-path "aws/creds/KubernetesDeveloper" {
-    capabilities = ["read"]
 }
 
 # List available secrets engines to retrieve accessor ID
