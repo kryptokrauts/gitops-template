@@ -10,7 +10,7 @@ module "argo" {
   redirect_uris = [
     "https://argo.<LOCAL_DNS>/oauth2/callback",
   ]
-  secret_mount_path = "secret"
+  secret_mount_path = vault_mount.secret.path
 }
 
 module "argocd" {
@@ -25,7 +25,7 @@ module "argocd" {
   redirect_uris = [
     "https://argocd.<LOCAL_DNS>/auth/callback",
   ]
-  secret_mount_path = "secret"
+  secret_mount_path = vault_mount.secret.path
 }
 
 module "gitlab" {
@@ -40,7 +40,7 @@ module "gitlab" {
   redirect_uris = [
     "https://gitlab.<LOCAL_DNS>/users/auth/openid_connect/callback",
   ]
-  secret_mount_path = "secret"
+  secret_mount_path = vault_mount.secret.path
 }
 
 module "console" {
@@ -55,7 +55,7 @@ module "console" {
   redirect_uris = [
     "https://vouch.<LOCAL_DNS>/auth",
   ]
-  secret_mount_path = "secret"
+  secret_mount_path = vault_mount.secret.path
 }
 
 # todo kubectl-oidc
