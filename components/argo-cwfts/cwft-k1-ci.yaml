@@ -1,0 +1,93 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ClusterWorkflowTemplate
+metadata:
+  name: cwft-k1-ci
+spec:
+#  entrypoint: ci-setup-src
+  arguments:
+    artifacts:
+    - name: jq-linux64
+      http:
+        url: https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64
+  templates:  
+  - name: build-template
+    container:
+      image: amazon/aws-cli:latest
+      command: [sh, -c]
+      args: ["{{inputs.parameters.command}}"]
+      envFrom:
+        - configMapRef:
+            name: install-script
+    inputs:
+      artifacts:
+      - name: jq-linux64
+        path: /usr/local/bin/jq
+        mode: 0755
+      parameters:
+      - name: command
+    outputs:
+      artifacts:
+      - name: argo-ci-key
+        path: /aws/argo-ci-key.pem
+      - name: resources
+        path: /aws/resources.txt
+  
+  - name: connect-ssh
+    container:
+      workingDir: /home/root
+      env:
+        - name: KUBEFIRST_BRANCH
+          value: "{{inputs.parameters.kubefirst_branch}}"
+        - name: GITOPS_BRANCH
+          value: "{{inputs.parameters.metaphor_branch}}"
+        - name: METAPHOR_BRANCH
+          value: "{{inputs.parameters.gitops_branch}}"
+        - name: KUBEFIRST_GITHUB_AUTH_TOKEN
+          valueFrom: 
+            secretKeyRef:
+              name: github-credentials
+              key: token
+      image: ubuntu:latest
+      command: [sh, -c]
+      args: ["{{inputs.parameters.command}}"]
+    dnsConfig:
+      nameservers:
+        - 208.67.222.222
+        - 1.1.1.1
+        - 1.0.0.1
+        - 8.8.8.8
+    inputs:
+      artifacts:
+      - name: resources
+        path: /aws/resources.txt
+      - name: argo-ci-key
+        path: /aws/argo-ci-key.pem
+      parameters:
+      - name: command
+      - name: kubefirst_branch          
+        default: main
+      - name: metaphor_branch          
+        default: main    
+      - name: gitops_branch          
+        default: main
+    outputs:
+      artifacts:
+      - name: install
+        path: /root/install.txt
+      - name: destroy
+        path: /root/destroy.txt
+
+  - name: destroy-template
+    container:
+      image: amazon/aws-cli:latest
+      command: [sh, -c]
+      args: ["{{inputs.parameters.command}}"]
+    inputs:
+      artifacts:
+      - name: jq-linux64
+        path: /usr/local/bin/jq
+        mode: 0755
+      - name: resources
+        path: /aws/resources.txt
+      parameters:
+      - name: command
