@@ -1,5 +1,5 @@
 resource "github_user_ssh_key" "kubefirst_bot" {
-  title = "kubefirst-bot"
+  title = "kubefirst-bot-feedkray-1"
   key   = var.kubefirst_bot_ssh_public_key
 }
 

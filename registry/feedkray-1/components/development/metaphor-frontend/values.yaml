@@ -1,0 +1,22 @@
+metaphor-frontend:
+  image:
+    repository: ghcr.io/kubernickels/metaphor-frontend
+  imagePullSecrets:
+  - name: docker-config
+  ingress:
+    className: nginx
+    enabled: true
+    annotations:
+      cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    hosts:
+      - host: metaphor-frontend-development.feedkray.one
+        paths:
+          - path: /
+            pathType: Prefix
+    tls:
+      - secretName: metaphor-frontend-tls
+        hosts:
+          - metaphor-frontend-development.feedkray.one
+  metaphor:
+    host: https://metaphor-frontend-development.feedkray.one/api
+  isLocal: true
