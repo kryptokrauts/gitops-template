@@ -6,8 +6,8 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: git@github.com:kubernickels/gitops.git
-    path: registry/kubernickels-1/components/argocd
+    repoURL: <GITOPS_REPO_GIT_URL>
+    path: registry/<CLUSTER_NAME>/components/argocd
     targetRevision: HEAD
   destination:
     server: https://kubernetes.default.svc

@@ -26,51 +26,24 @@ spec:
               cert-manager.io/cluster-issuer: "letsencrypt-prod"
               nginx.ingress.kubernetes.io/ssl-passthrough: "true"
             hosts:
-              - argocd.kubernickels.com
+              - argocd.<DOMAIN_NAME>
             paths:
               - /
             pathType: Prefix
             tls:
               - secretName: argocd-server-tls
                 hosts: 
-                  - argocd.kubernickels.com
+                  - argocd.<DOMAIN_NAME>
             https: true
-          additionalApplications:
-          - name: registry
-            namespace: argocd
-            additionalLabels: {}
-            additionalAnnotations: {}
-            finalizers:
-            - resources-finalizer.argocd.argoproj.io
-            project: default
-            source:
-              repoURL: git@github.com:kubernickels/gitops.git
-              targetRevision: HEAD
-              path: registry
-            destination:
-              server: https://kubernetes.default.svc
-              namespace: argocd
-            syncPolicy:
-              automated:
-                prune: true
-                selfHeal: true
-              syncOptions:
-              - CreateNamespace=true
-              retry:
-                limit: 5
-                backoff:
-                  duration: 5s
-                  maxDuration: 5m0s
-                  factor: 2
           config:
             oidc.config: |
               name: Vault
-              issuer: https://vault.kubernickels.com/v1/identity/oidc/provider/kubefirst
+              issuer: https://vault.<DOMAIN_NAME>/v1/identity/oidc/provider/kubefirst
               clientID: $argocd-oidc-secret:clientId
               clientSecret: $argocd-oidc-secret:clientSecret
               requestedScopes: ["openid", "groups", "user", "profile", "email"]
               requestedIDTokenClaims: {"groups": {"essential": true}}
-            url: 'https://argocd.kubernickels.com'        
+            url: 'https://argocd.<DOMAIN_NAME>'        
   destination:
     server: "https://kubernetes.default.svc"
     namespace: argocd
