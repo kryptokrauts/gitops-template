@@ -5,9 +5,7 @@ metaphor-frontend:
   - name: docker-config
   ingress:
     enabled: true
-    annotations:
-      traefik.ingress.kubernetes.io/router.middlewares: production-redirect-to-https@kubernetescrd
-    className: ""
+    className: "nginx"
     hosts:
       - host: metaphor-frontend-production.<DOMAIN_NAME>
         paths:

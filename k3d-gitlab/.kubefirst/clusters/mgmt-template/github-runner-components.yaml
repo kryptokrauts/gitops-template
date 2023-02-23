@@ -1,19 +1,19 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: actions-runner-controller-components
+  name: gitlab-runner-components
   namespace: argocd
   annotations:
-    argocd.argoproj.io/sync-wave: "20"
+    argocd.argoproj.io/sync-wave: '60'
 spec:
   project: default
   source:
     repoURL: <GITOPS_REPO_GIT_URL>
-    path: registry/<CLUSTER_NAME>/components/actions-runner-controller
+    path: registry/<CLUSTER_NAME>/components/gitlab-runner
     targetRevision: HEAD
   destination:
     server: https://kubernetes.default.svc
-    namespace: github-runner
+    namespace: gitlab-runner
   syncPolicy:
     automated:
       prune: true

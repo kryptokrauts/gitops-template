@@ -5,11 +5,10 @@ metadata:
   namespace: argocd
   annotations:
     argocd.argoproj.io/sync-wave: "20"
-    addons.kubefirst.io/name: github
 spec:
   project: default
   source:
-    repoURL: 'https://actions-runner-controller.github.io/actions-runner-controller'
+    repoURL: https://actions-runner-controller.github.io/actions-runner-controller
     targetRevision: 0.20.2
     helm:
       values: |-

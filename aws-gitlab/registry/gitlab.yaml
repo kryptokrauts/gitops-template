@@ -4,7 +4,6 @@ metadata:
   name: gitlab
   annotations:
     argocd.argoproj.io/sync-wave: "0"
-    addons.kubefirst.io/name: gitlab
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
@@ -15,7 +14,6 @@ metadata:
   - resources-finalizer.argocd.argoproj.io
   annotations:
     argocd.argoproj.io/sync-wave: "20"
-    addons.kubefirst.io/name: gitlab
 spec:
   project: default
   source:
@@ -105,7 +103,6 @@ metadata:
   namespace: argocd
   annotations:
     argocd.argoproj.io/sync-wave: "21"
-    addons.kubefirst.io/name: gitlab
 spec:
   template:
     spec:

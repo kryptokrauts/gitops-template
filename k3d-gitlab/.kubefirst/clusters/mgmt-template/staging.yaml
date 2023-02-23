@@ -1,19 +1,21 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: argo-cwft-components
+  name: staging
   namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
   annotations:
-    argocd.argoproj.io/sync-wave: "55"
+    argocd.argoproj.io/sync-wave: "40"
 spec:
   project: default
   source:
     repoURL: <GITOPS_REPO_GIT_URL>
-    path: registry/<CLUSTER_NAME>/components/argo-cwft
+    path: registry/<CLUSTER_NAME>/components/staging
     targetRevision: HEAD
   destination:
     server: https://kubernetes.default.svc
-    namespace: argo
+    namespace: staging
   syncPolicy:
     automated:
       prune: true
