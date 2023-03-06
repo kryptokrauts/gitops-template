@@ -4,19 +4,21 @@ metaphor:
   imagePullSecrets:
     - name: docker-config
   ingress:
-    className: nginx
     enabled: true
     annotations:
-      cert-manager.io/cluster-issuer: 'letsencrypt-prod'
+      traefik.ingress.kubernetes.io/router.middlewares: staging-redirect-to-https@kubernetescrd
+    className: ''
     hosts:
       - host: metaphor-staging.<DOMAIN_NAME>
         paths:
           - path: /
             pathType: Prefix
     tls:
-      - secretName: metaphor-tls
+      - secretName: metaphor-staging-tls
         hosts:
           - metaphor-staging.<DOMAIN_NAME>
   metaphor:
     host: https://metaphor-staging.<DOMAIN_NAME>/api
+  vaultMountPoint: kubefirst
+  vaultSecretPath: staging/metaphor
   isLocal: true

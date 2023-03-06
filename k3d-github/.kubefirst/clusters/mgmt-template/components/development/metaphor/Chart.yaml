@@ -4,6 +4,6 @@ dependencies:
     repository: http://chartmuseum.chartmuseum.svc.cluster.local:8080
     version: 0.1.0
 description: metaphor instance
-name: metaphor-staging
+name: metaphor-development
 type: application
 version: 1.0.0

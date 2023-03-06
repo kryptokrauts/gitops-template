@@ -1,7 +1,7 @@
 apiVersion: actions.summerwind.dev/v1alpha1
 kind: RunnerDeployment
 metadata:
-  name: actions-runner-metaphor-frontend
+  name: actions-runner-metaphor
   annotations:
     argocd.argoproj.io/sync-wave: '20'
 spec:

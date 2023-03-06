@@ -1,8 +1,8 @@
 metaphor:
   image:
-    repository: ghcr.io/<GITHUB_OWNER>/metaphor-frontend
+    repository: registry.gitlab.com/<GITLAB_OWNER>/metaphor-frontend
   imagePullSecrets:
-    - name: docker-config
+    - name: metaphor-deploy
   ingress:
     className: nginx
     enabled: true
