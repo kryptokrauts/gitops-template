@@ -36,7 +36,7 @@ jobs:
           argo version --short
           argo submit .argo/publish.yaml \
             --generate-name="${GITHUB_REPOSITORY_NAME_PART}-publish-${GITHUB_SHA_SHORT}-" \
-            -p appName="${GITHUB_REPOSITORY_NAME_PART}" \
+            -p appName="metaphor" \
             -p branch="${GITHUB_REF_NAME}" \
             -p containerRegistryURL="ghcr.io/${GITHUB_REPOSITORY_OWNER_PART_SLUG}/${GITHUB_REPOSITORY_NAME_PART}:${GITHUB_SHA_SHORT}" \
             -p gitUrlNoProtocol="git@github.com:${GITHUB_REPOSITORY_OWNER_PART_SLUG}" \
@@ -71,7 +71,7 @@ jobs:
           argo version --short
           argo submit .argo/deploy.yaml \
             --generate-name="${GITHUB_REPOSITORY_NAME_PART}-development-${GITHUB_SHA_SHORT}-" \
-            -p appName="${GITHUB_REPOSITORY_NAME_PART}" \
+            -p appName="metaphor" \
             -p branch="${GITHUB_REF_NAME}" \
             -p clusterName="<CLUSTER_NAME>" \
             -p environment="development" \
@@ -107,7 +107,7 @@ jobs:
           argo version --short
           argo submit .argo/deploy.yaml \
             --generate-name="${GITHUB_REPOSITORY_NAME_PART}-staging-${GITHUB_SHA_SHORT}-" \
-            -p appName="${GITHUB_REPOSITORY_NAME_PART}" \
+            -p appName="metaphor" \
             -p branch="${GITHUB_REF_NAME}" \
             -p clusterName="<CLUSTER_NAME>" \
             -p environment="staging" \
@@ -144,7 +144,7 @@ jobs:
           argo version --short
           argo submit .argo/release.yaml \
             --generate-name="${GITHUB_REPOSITORY_NAME_PART}-release-${GITHUB_SHA_SHORT}-" \
-            -p appName="${GITHUB_REPOSITORY_NAME_PART}" \
+            -p appName="metaphor" \
             -p branch="${GITHUB_REF_NAME}" \
             -p clusterName="<CLUSTER_NAME>" \
             -p environment="production" \
