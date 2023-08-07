@@ -1,0 +1,38 @@
+# apiVersion: tf.upbound.io/v1beta1
+# kind: Workspace
+# metadata:
+#   name: <WORKLOAD_CLUSTER_NAME>-vault-configuration
+#   annotations:
+#     argocd.argoproj.io/sync-wave: "0"
+# spec:
+#   providerConfigRef:
+#     name: <WORKLOAD_CLUSTER_NAME>
+#   forProvider:
+#     source: Inline
+#     module: |
+#       data "civo_kubernetes_cluster" "kubefirst" {
+#         name = "<WORKLOAD_CLUSTER_NAME>"
+#       }
+
+#       data "vault_generic_secret" "cluster_secrets" {
+#         path = "secret/clusters/<WORKLOAD_CLUSTER_NAME>"
+#       }
+
+#       resource "vault_auth_backend" "k8s" {
+#         type = "kubernetes"
+#         path = "kubernetes/<WORKLOAD_CLUSTER_NAME>"
+#       }
+
+#       resource "vault_kubernetes_auth_backend_config" "k8s" {
+#         backend            = vault_auth_backend.k8s.path
+#         kubernetes_host    = data.civo_kubernetes_cluster.kubefirst.api_endpoint
+#       }
+
+#       resource "vault_kubernetes_auth_backend_role" "k8s_external_secrets" {
+#         backend                          = vault_auth_backend.k8s.path
+#         role_name                        = "external-secrets"
+#         bound_service_account_names      = ["external-secrets"]
+#         bound_service_account_namespaces = ["*"]
+#         token_ttl                        = 86400
+#         token_policies                   = ["admin", "default"]
+#       }
