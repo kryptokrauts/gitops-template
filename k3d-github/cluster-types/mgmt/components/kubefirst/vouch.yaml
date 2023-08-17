@@ -14,16 +14,15 @@ spec:
     helm:
       values: |-
         ingress:
-          enabled: true
-          annotations:
-            kubernetes.io/ingress.class: nginx
           hosts:
-            - vouch.<DOMAIN_NAME>
+            - host: vouch.<DOMAIN_NAME>
+              paths:
+                - path: /
+                  pathType: Prefix
           tls:
             - secretName: vouch-tls
               hosts:
                 - vouch.<DOMAIN_NAME>
-        existingSecretName: "kubefirst-console-secrets"
   destination:
     server: https://kubernetes.default.svc
     namespace: kubefirst
