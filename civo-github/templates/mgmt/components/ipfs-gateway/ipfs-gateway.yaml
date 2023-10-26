@@ -1,21 +1,22 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: dev-metaphor
+  name: ipfs-gateway
   namespace: argocd
-  finalizers:
-    - resources-finalizer.argocd.argoproj.io
   annotations:
-    argocd.argoproj.io/sync-wave: '45'
+    argocd.argoproj.io/sync-wave: '10'
 spec:
   project: default
   source:
     repoURL: <GITOPS_REPO_URL>
-    path: registry/environments/development/metaphor
+    path: registry/clusters/<CLUSTER_NAME>/components/ipfs-gateway/composition
     targetRevision: HEAD
+    helm:
+      valueFiles:
+        - values.yaml
   destination:
-    name: <WORKLOAD_CLUSTER_NAME>
-    namespace: development
+    name: in-cluster
+    namespace: ipfs-gateway
   syncPolicy:
     automated:
       prune: true

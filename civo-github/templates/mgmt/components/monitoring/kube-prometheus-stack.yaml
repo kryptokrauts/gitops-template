@@ -1,0 +1,281 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kube-prometheus-stack
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: '10'
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://prometheus-community.github.io/helm-charts
+    chart: kube-prometheus-stack
+    targetRevision: 52.0.1
+    helm:
+      values: |-
+        prometheusOperator:
+          resources:
+            limits:
+              memory: 64Mi
+            requests:
+              cpu: 10m
+              memory: 64Mi
+        kube-state-metrics:
+          resources:
+            limits:
+              memory: 64Mi
+            requests:
+              cpu: 10m
+              memory: 64Mi
+          prometheus:
+            monitor:
+              enabled: true
+          selfMonitor:
+            enabled: true
+        prometheus-node-exporter:
+          resources:
+            limits:
+              memory: 24Mi
+            requests:
+              cpu: 100m
+              memory: 24Mi
+        prometheus:
+          serviceMonitorSelector: {}
+          prometheusSpec:
+            resources:
+              limits:
+                memory: 1500Mi
+              requests:
+                cpu: 300m
+                memory: 1500Mi
+            serviceMonitorSelectorNilUsesHelmValues: false
+            ruleSelectorNilUsesHelmValues: false
+          ingress:
+            enabled: false
+            ingressClassName: nginx
+            annotations:
+              <CERT_MANAGER_ISSUER_ANNOTATION_1>
+              <CERT_MANAGER_ISSUER_ANNOTATION_2>
+              <CERT_MANAGER_ISSUER_ANNOTATION_3>
+              <CERT_MANAGER_ISSUER_ANNOTATION_4>
+            hosts:
+            - host: prometheus.<DOMAIN_NAME>
+              paths:
+              - path: /
+                pathType: Prefix
+            tls:
+            - secretName: prometheus-tls
+              hosts:
+              - prometheus.<DOMAIN_NAME>
+        grafana:
+          resources:
+            limits:
+              memory: 284Mi
+            requests:
+              cpu: 100m
+              memory: 284Mi
+          admin:
+            existingSecret: grafana-secrets
+          sidecar:
+            dashboards:
+              enabled: true
+              folderAnnotation: grafana-dashboard-dir
+          grafana.ini:
+            analytics:
+              reporting_enabled: false
+              check_for_updates: false
+              check_for_plugin_updates: false
+              feedback_links_enabled: false
+            plugins:
+              enable_alpha: true
+            # https://grafana.com/docs/grafana/latest/setup-grafana/configure-security/configure-authentication/github/#steps
+            auth.github:
+              enabled: false
+              # TODO: add manually to secret in vault
+              client_id: $__file{/etc/secrets/GITHUB_CLIENT_ID}
+              client_secret: $__file{/etc/secrets/GITHUB_CLIENT_SECRET}
+              scopes: user:email,read:org
+              auth_url: https://github.com/login/oauth/authorize
+              token_url: https://github.com/login/oauth/access_token
+              api_url: https://api.github.com/user
+              allow_sign_up: true
+              allowed_organizations: kryptokrauts
+              role_attribute_path: contains(groups[*], '@kryptokrauts/grafana-admins') && 'GrafanaAdmin' || 'Viewer'
+              allow_assign_grafana_admin: true
+          ingress:
+            enabled: true
+            ingressClassName: nginx
+            annotations:
+              <CERT_MANAGER_ISSUER_ANNOTATION_1>
+              <CERT_MANAGER_ISSUER_ANNOTATION_2>
+              <CERT_MANAGER_ISSUER_ANNOTATION_3>
+              <CERT_MANAGER_ISSUER_ANNOTATION_4>
+            hosts:
+            - host: grafana.<DOMAIN_NAME>
+              paths:
+              - path: /
+                pathType: Prefix
+            tls:
+            - secretName: grafana-tls
+              hosts:
+              - grafana.<DOMAIN_NAME>
+          plugins:
+            - grafana-piechart-panel
+          dashboardProviders:
+          dashboardproviders.yaml:
+            apiVersion: 1
+            providers:
+            - name: 'tools'
+              orgId: 1
+              folder: 'Tools'
+              type: file
+              disableDeletion: true
+              editable: true
+              options:
+                path: /var/lib/grafana/dashboards/tools
+          dashboards:
+            tools:
+              argocd:
+                gnetId: 14584
+                revision: 1
+                datasource: Prometheus
+              blackbox:
+                gnetId: 13659
+                revision: 1
+                datasource: Prometheus
+          extraSecretMounts:
+          - name: secrets-mount
+            secretName: grafana-secrets
+            defaultMode: 0440
+            mountPath: /etc/secrets
+            readOnly: true
+        alertmanager:
+          alertmanagerSpec:
+            resources:
+              limits:
+                memory: 32Mi
+              requests:
+                cpu: 10m
+                memory: 32Mi
+          ingress:
+            enabled: true
+            ingressClassName: nginx
+            annotations:
+              <CERT_MANAGER_ISSUER_ANNOTATION_1>
+              <CERT_MANAGER_ISSUER_ANNOTATION_2>
+              <CERT_MANAGER_ISSUER_ANNOTATION_3>
+              <CERT_MANAGER_ISSUER_ANNOTATION_4>
+            hosts:
+            - host: alertmanager.<DOMAIN_NAME>
+              paths:
+              - path: /
+                pathType: Prefix
+            tls:
+            - secretName: alertmanager-tls
+              hosts:
+              - alertmanager.<DOMAIN_NAME>
+        defaultRules:
+          rules:
+            kubeSchedulerAlerting: false
+            kubeSchedulerRecording: false
+            kubeControllerManager: false
+        additionalPrometheusRulesMap:
+        - name: blackbox
+          groups:
+          - name: blackbox
+            rules:
+              - alert: BlackboxProbeHttpFailure
+                expr: probe_http_status_code <= 199 OR probe_http_status_code >= 400
+                for: 0m
+                labels:
+                  severity: critical
+                  namespace: monitoring
+                annotations:
+                  summary: "Probe failed (URL: {{ $labels.instance }})"
+                  description: "Probe failed\n STATUS_CODE = {{ $value }})"
+          - name: pods
+            rules:
+              - alert: ContainerCpuUsage
+                expr: (sum(rate(container_cpu_usage_seconds_total{name!=""}[5m])) BY (instance, name) * 100) > 80
+                for: 5m
+                labels:
+                  severity: critical
+                  namespace: monitoring
+                annotations:
+                  summary: "Container CPU usage"
+                  description: "Container CPU usage is above 80%\n VALUE = {{ $value }}"
+              - alert: HostHighCpuLoad
+                expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[2m])) * 100) > 90
+                for: 0m
+                labels:
+                  severity: warning
+                  namespace: monitoring
+                annotations:
+                  summary: Host high CPU load (instance {{ $labels.instance }})
+                  description: "CPU load is > 80%\n  VALUE = {{ $value }}"
+              - alert: HostOutOfMemory
+                expr: node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes * 100 < 10
+                for: 2m
+                labels:
+                  severity: warning
+                annotations:
+                  summary: Host out of memory (instance {{ $labels.instance }})
+                  description: "Node memory is filling up (< 10% left)\n  VALUE = {{ $value }}"
+              - alert: KubePersistentVolumeFillingUp
+                annotations:
+                  description: The PersistentVolume claimed by {{ $labels.persistentvolumeclaim }}
+                    in Namespace {{ $labels.namespace }} is only {{ $value | humanizePercentage }}
+                    free.
+                  summary: PersistentVolume is filling up.
+                expr: |
+                  (
+                    kubelet_volume_stats_available_bytes{job="kubelet"}
+                      /
+                    kubelet_volume_stats_capacity_bytes{job="kubelet"}
+                  ) < 0.03
+                  and
+                  kubelet_volume_stats_used_bytes{job="kubelet"} > 0
+                  unless on(namespace, persistentvolumeclaim)
+                  kube_persistentvolumeclaim_access_mode{ access_mode="ReadOnlyMany"} == 1
+                  unless on(namespace, persistentvolumeclaim)
+                  kube_persistentvolumeclaim_labels{label_excluded_from_alerts="true"} == 1
+                for: 1m
+                labels:
+                  severity: critical
+              - alert: KubePodCrashLooping
+                annotations:
+                  description: 'Pod {{ $labels.namespace }}/{{ $labels.pod }} ({{ $labels.container
+                    }}) is in waiting state (reason: "CrashLoopBackOff").'
+                  summary: Pod is crash looping.
+                expr: |
+                  max_over_time(kube_pod_container_status_waiting_reason{reason="CrashLoopBackOff", job="kube-state-metrics"}[5m]) >= 1
+                for: 15m
+                labels:
+                  severity: warning
+              - alert: KubePodNotReady
+                annotations:
+                  description: Pod {{ $labels.namespace }}/{{ $labels.pod }} has been in a non-ready
+                    state for longer than 15 minutes.
+                  summary: Pod has been in a non-ready state for more than 15 minutes.
+                expr: |
+                  sum by (namespace, pod) (
+                    max by(namespace, pod) (
+                      kube_pod_status_phase{job="kube-state-metrics", phase=~"Pending|Unknown"}
+                    ) * on(namespace, pod) group_left(owner_kind) topk by(namespace, pod) (
+                      1, max by(namespace, pod, owner_kind) (kube_pod_owner{owner_kind!="Job"})
+                    )
+                  ) > 0
+                for: 15m
+                labels:
+                  severity: warning
+  destination:
+    name: in-cluster
+    namespace: monitoring
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

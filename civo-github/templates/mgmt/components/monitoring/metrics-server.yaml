@@ -1,0 +1,32 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: metrics-server
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: '10'
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://kubernetes-sigs.github.io/metrics-server
+    chart: metrics-server
+    targetRevision: 3.10.0
+    helm:
+      values: |-
+        resources:
+          limits:
+            memory: 200Mi
+          requests:
+            cpu: 30m
+            memory: 48Mi
+  destination:
+    name: in-cluster
+    namespace: monitoring
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

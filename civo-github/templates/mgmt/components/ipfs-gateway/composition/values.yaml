@@ -1,0 +1,110 @@
+imagePullSecrets:
+  - name: docker-config
+
+ipfsNode:
+  image:
+    repository: ipfs/kubo
+    tag: v0.23.0
+  storageRequest: 30Gi
+  profile: server
+  initScripts:
+    001-init.sh: |
+      #!/bin/sh
+      set -e
+      set -x
+      user=ipfs
+
+      ipfs init --profile=server
+      ipfs config Addresses.API /ip4/0.0.0.0/tcp/5001
+      ipfs config Addresses.Gateway /ip4/0.0.0.0/tcp/8080
+      ipfs config --json Swarm.ConnMgr.HighWater 2000
+      ipfs config --json Datastore.BloomFilterSize 1048576
+      ipfs config Datastore.StorageMax 20GB
+      ipfs config --json Peering.Peers '[{"ID":"QmWaik1eJcGHq1ybTWe7sezRfqKNcDRNkeBaLnGwQJz1Cj","Addrs":["/dnsaddr/fra1-1.hostnodes.pinata.cloud"]},{"ID":"QmNfpLrQQZr5Ns9FAJKpyzgnDL2GgC6xBug1yUZozKFgu4","Addrs":["/dnsaddr/fra1-2.hostnodes.pinata.cloud"]},{"ID":"QmPo1ygpngghu5it8u4Mr3ym6SEU2Wp2wA66Z91Y1S1g29","Addrs":["/dnsaddr/fra1-3.hostnodes.pinata.cloud"]},{"ID":"QmRjLSisUCHVpFa5ELVvX3qVPfdxajxWJEHs9kN3EcxAW6","Addrs":["/dnsaddr/nyc1-1.hostnodes.pinata.cloud"]},{"ID":"QmPySsdmbczdZYBpbi2oq2WMJ8ErbfxtkG8Mo192UHkfGP","Addrs":["/dnsaddr/nyc1-2.hostnodes.pinata.cloud"]},{"ID":"QmSarArpxemsPESa6FNkmuu9iSE1QWqPX2R3Aw6f5jq4D5","Addrs":["/dnsaddr/nyc1-3.hostnodes.pinata.cloud"]},{"ID":"QmcFf2FH3CEgTNHeMRGhN7HNHU1EXAxoEk6EFuSyXCsvRE","Addrs":["/dnsaddr/node-1.ingress.cloudflare-ipfs.com"]},{"ID":"QmcFmLd5ySfk2WZuJ1mfSWLDjdmHZq7rSAua4GoeSQfs1z","Addrs":["/dnsaddr/node-2.ingress.cloudflare-ipfs.com"]},{"ID":"QmcfFmzSDVbwexQ9Au2pt5YEXHK5xajwgaU6PpkbLWerMa","Addrs":["/dnsaddr/node-3.ingress.cloudflare-ipfs.com"]},{"ID":"QmcfJeB3Js1FG7T8YaZATEiaHqNKVdQfybYYkbT1knUswx","Addrs":["/dnsaddr/node-4.ingress.cloudflare-ipfs.com"]},{"ID":"QmcfVvzK4tMdFmpJjEKDUoqRgP4W9FnmJoziYX5GXJJ8eZ","Addrs":["/dnsaddr/node-5.ingress.cloudflare-ipfs.com"]},{"ID":"QmcfZD3VKrUxyP9BbyUnZDpbqDnT7cQ4WjPP8TRLXaoE7G","Addrs":["/dnsaddr/node-6.ingress.cloudflare-ipfs.com"]},{"ID":"QmcfZP2LuW4jxviTeG8fi28qjnZScACb8PEgHAc17ZEri3","Addrs":["/dnsaddr/node-7.ingress.cloudflare-ipfs.com"]},{"ID":"QmcfgsJsMtx6qJb74akCw1M24X1zFwgGo11h1cuhwQjtJP","Addrs":["/dnsaddr/node-8.ingress.cloudflare-ipfs.com"]},{"ID":"Qmcfr2FC7pFzJbTSDfYaSy1J8Uuy8ccGLeLyqJCKJvTHMi","Addrs":["/dnsaddr/node-9.ingress.cloudflare-ipfs.com"]},{"ID":"QmcfR3V5YAtHBzxVACWCzXTt26SyEkxdwhGJ6875A8BuWx","Addrs":["/dnsaddr/node-10.ingress.cloudflare-ipfs.com"]},{"ID":"Qmcfuo1TM9uUiJp6dTbm915Rf1aTqm3a3dnmCdDQLHgvL5","Addrs":["/dnsaddr/node-11.ingress.cloudflare-ipfs.com"]},{"ID":"QmcfV2sg9zaq7UUHVCGuSvT2M2rnLBAPsiE79vVyK3Cuev","Addrs":["/dnsaddr/node-12.ingress.cloudflare-ipfs.com"]},{"ID":"QmUEMvxS2e7iDrereVYc5SWPauXPyNwxcy9BXZrC1QTcHE","Addrs":["/dns/cluster0.fsn.dwebops.pub"]},{"ID":"QmNSYxZAiJHeLdkBg38roksAR9So7Y5eojks1yjEcUtZ7i","Addrs":["/dns/cluster1.fsn.dwebops.pub"]},{"ID":"QmUd6zHcbkbcs7SMxwLs48qZVX3vpcM8errYS7xEczwRMA","Addrs":["/dns/cluster2.fsn.dwebops.pub"]},{"ID":"QmbVWZQhCGrS7DhgLqWbgvdmKN7JueKCREVanfnVpgyq8x","Addrs":["/dns/cluster3.fsn.dwebops.pub"]},{"ID":"QmdnXwLrC8p1ueiq2Qya8joNvk3TVVDAut7PrikmZwubtR","Addrs":["/dns/cluster4.fsn.dwebops.pub"]},{"ID":"12D3KooWCRscMgHgEo3ojm8ovzheydpvTEqsDtq7Vby38cMHrYjt","Addrs":["/dns4/nft-storage-am6.nft.dwebops.net/tcp/18402"]},{"ID":"12D3KooWQtpvNvUYFzAo1cRYkydgk15JrMSHp6B6oujqgYSnvsVm","Addrs":["/dns4/nft-storage-dc13.nft.dwebops.net/tcp/18402"]},{"ID":"12D3KooWQcgCwNCTYkyLXXQSZuL5ry1TzpM8PRe9dKddfsk1BxXZ","Addrs":["/dns4/nft-storage-sv15.nft.dwebops.net/tcp/18402"]}]'
+
+sharpResizer:
+  image:
+    repository: ghcr.io/kryptokrauts/sharp-resizer
+    tag: v1.0.0
+  replicaCount: 1
+  port: 8181
+  ipfsEndpoint: http://ipfs-node.ipfs-gateway.svc:8080/ipfs
+  inputPixelsLimit: 300000000
+  resizeImageQuality: 95
+
+ipfsGateway:
+  image:
+    repository: nginx
+    tag: 1.25
+  storageRequest: 15Gi
+  nginxConfd:
+    default.conf: |
+      proxy_cache_path /ipfs-gateway-cache/images levels=1:2 keys_zone=ipfs_cache:10m max_size=12g
+                      inactive=14d use_temp_path=off;
+
+      server {
+              server_tokens off;
+
+              location ~ /ipfs/([0-9]+)/([a-zA-Z0-9]*)/?$ {
+                      proxy_cache ipfs_cache;
+
+                      proxy_cache_valid 200     14d;
+                      proxy_cache_valid 301 302  1h;
+                      proxy_cache_valid any      1m;
+
+                      proxy_pass http://sharp-resizer.ipfs-gateway.svc;
+              }
+
+              location ~ /ipfs/([a-zA-Z0-9]*)/?$ {
+                      proxy_pass http://ipfs-node.ipfs-gateway.svc:8080;
+              }
+      }
+  nginxConfig:
+    nginx.conf: |
+      load_module /etc/nginx/modules/ngx_http_image_filter_module.so;
+
+      user  nginx;
+      worker_processes  auto;
+
+      error_log  /var/log/nginx/error.log notice;
+      pid        /var/run/nginx.pid;
+
+      events {
+          worker_connections  1024;
+      }
+
+      http {
+          include       /etc/nginx/mime.types;
+          default_type  application/octet-stream;
+
+          log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                            '$status $body_bytes_sent "$http_referer" '
+                            '"$http_user_agent" "$http_x_forwarded_for"';
+
+          access_log  /var/log/nginx/access.log  main;
+
+          sendfile        on;
+          #tcp_nopush     on;
+
+          keepalive_timeout  65;
+
+          #gzip  on;
+
+          include /etc/nginx/conf.d/*.conf;
+      }
+  ingress:
+    className: nginx
+    annotations:
+      <CERT_MANAGER_ISSUER_ANNOTATION_1>
+      <CERT_MANAGER_ISSUER_ANNOTATION_2>
+      <CERT_MANAGER_ISSUER_ANNOTATION_3>
+      <CERT_MANAGER_ISSUER_ANNOTATION_4>
+    hosts:
+    - host: ipfs-gateway.<DOMAIN_NAME>
+      paths:
+      - path: /
+        pathType: Prefix
+    tls:
+    - secretName: ipfs-gateway-tls
+      hosts:
+      - ipfs-gateway.<DOMAIN_NAME>

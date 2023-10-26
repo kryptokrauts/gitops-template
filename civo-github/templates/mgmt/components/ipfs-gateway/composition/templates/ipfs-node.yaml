@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ipfs-node
+  labels:
+    app: ipfs-node
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ipfs-node
+  template:
+    metadata:
+      labels:
+        app: ipfs-node
+    spec:
+      containers:
+      - name: ipfs-node
+        image: "{{ .Values.ipfsNode.image.repository }}:{{ .Values.ipfsNode.image.tag }}"
+        env:
+        - name: IPFS_PROFILE
+          value: {{ .Values.ipfsNode.profile }}
+        ports:
+        - containerPort: 4001
+          name: swarm
+          protocol: TCP
+        - containerPort: 5001
+          name: api
+          protocol: TCP
+        - containerPort: 8080
+          name: gateway
+          protocol: TCP
+        volumeMounts:
+          - name: ipfs-node-volume
+            mountPath: /data/ipfs
+          - name: ipfs-node-volume
+            mountPath: /export
+          - name: ipfs-container-init-volume
+            mountPath: /container-init.d
+      volumes:
+      - name: ipfs-container-init-volume
+        configMap:
+          name: ipfs-node-init-cfg
+      - name: ipfs-node-volume
+        persistentVolumeClaim:
+          claimName: ipfs-node
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ipfs-node
+  labels:
+    app: ipfs-node
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.ipfsNode.storageRequest }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ipfs-node-init-cfg
+data:
+{{ toYaml .Values.ipfsNode.initScripts | indent 2 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ipfs-node
+spec:
+  selector:
+    app: ipfs-node
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080

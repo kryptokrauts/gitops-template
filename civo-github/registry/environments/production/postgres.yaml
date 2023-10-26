@@ -1,0 +1,136 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: prd-postgres
+  namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+  annotations:
+    argocd.argoproj.io/sync-wave: '45'
+spec:
+  project: default
+  source:
+    repoURL: 'https://charts.bitnami.com/bitnami'
+    chart: postgresql
+    targetRevision: 13.1.4
+    helm:
+      values: |-
+        auth:
+          existingSecret: postgres-secrets
+        primary:
+          initdb:
+            scriptsConfigMap: postgres-initdb
+          extraEnvVarsSecret: postgres-secrets
+  destination:
+    name: in-cluster
+    namespace: production
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+---
+apiVersion: external-secrets.io/v1beta1
+kind: ExternalSecret
+metadata:
+  name: postgres-secrets
+  namespace: production
+  annotations:
+    argocd.argoproj.io/sync-wave: '0'
+spec:
+  dataFrom:
+    - extract:
+        key: /production/postgres
+  refreshInterval: 10s
+  secretStoreRef:
+    kind: ClusterSecretStore
+    name: vault-kv-secret
+  target:
+    name: postgres-secrets
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: postgres-initdb
+  namespace: production
+data:
+  init.sh: |
+    #!/bin/bash
+
+    set -e
+    set -u
+
+    # use admin password from env to execute psql commands
+    export PGPASSWORD="$POSTGRES_PASSWORD"
+
+    USER_POSTGRES=postgres
+    USER_PRD_SOONY=prd-soony
+
+    # we created a special readonly user that will be granted rights to view all databases
+    ROLE_AND_USER_PRD_READ_ACCESS=prd-read-access
+
+    function create_users() {
+      local USERS=(
+        "prd-write-access"
+        "$USER_PRD_SOONY")
+      local USER_PASSWORDS=(
+        "$PG_WRITE_ACCESS_PASSWORD"
+        "$PG_SOONY_PASSWORD")
+
+      echo "Creating ${#USERS[@]} users..."
+      local USER_INDEX=0
+      for user in ${USERS[@]}; do
+        psql -v ON_ERROR_STOP=1 --username "$USER_POSTGRES" <<-EOSQL
+          CREATE USER "$user" WITH PASSWORD '${USER_PASSWORDS[USER_INDEX]}';
+    EOSQL
+        USER_INDEX=${USER_INDEX}+1
+        echo "Created user: $user"
+      done
+    }
+
+    function create_read_role_and_user() {
+      echo "Creating read-only role (with user) to access to all databases within the cluster..."
+      psql -v ON_ERROR_STOP=1 --username "$USER_POSTGRES" <<-EOSQL
+        CREATE ROLE "$ROLE_AND_USER_PRD_READ_ACCESS" WITH LOGIN NOINHERIT NOCREATEDB NOCREATEROLE NOSUPERUSER PASSWORD '${PG_READ_ACCESS_PASSWORD}';
+    EOSQL
+    }
+
+    function create_databases_with_and_set_grant_privileges() {
+      local DATABASES=(
+        "soon-market-backend"
+        "soony")
+
+      echo "Creating ${#DATABASES[@]} databases"
+      for db in ${DATABASES[@]}; do
+        psql -v ON_ERROR_STOP=1 --username "$USER_POSTGRES" <<-EOSQL
+          CREATE DATABASE "$db";
+    EOSQL
+        if [ "$db" = "soony" ]
+        then
+          psql -v ON_ERROR_STOP=1 --username "$USER_POSTGRES" <<-EOSQL
+            GRANT ALL PRIVILEGES ON DATABASE "$db" TO "$USER_PRD_SOONY";
+    EOSQL
+        fi
+        echo "Created database: $db"
+        grant_read_access "$db"
+      done
+    }
+
+    # grant read access within given database, schema public
+    # create function for checking HTTP method
+    function grant_read_access() {
+      local DATABASE=$1
+      psql -v ON_ERROR_STOP=1 --username "$USER_POSTGRES" -d "$DATABASE" <<-EOSQL
+        GRANT CONNECT ON DATABASE "$DATABASE" TO "$ROLE_AND_USER_PRD_READ_ACCESS";
+        GRANT USAGE ON SCHEMA public TO "$ROLE_AND_USER_PRD_READ_ACCESS";
+        ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO "$ROLE_AND_USER_PRD_READ_ACCESS";
+        ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON SEQUENCES TO "$ROLE_AND_USER_PRD_READ_ACCESS";
+    EOSQL
+      echo "Granted read-only access to database: $DATABASE"
+    }
+
+    echo "Executing custom initdb ..."
+    create_users
+    create_read_role_and_user
+    create_databases_with_and_set_grant_privileges

@@ -1,0 +1,71 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: pgadmin
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: '1'
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://helm.runix.net
+    chart: pgadmin4
+    targetRevision: 1.18.0
+    helm:
+      values: |-
+        namespace: pgadmin
+        image:
+          tag: 7.7
+        existingSecret: pgadmin-secrets
+        secretKeys:
+          pgadminPasswordKey: pgadmin-password
+        env:
+          email: pgadmin@kryptokrauts.com
+        ingress:
+          ingressClassName: nginx
+          enabled: true
+          annotations:
+            <CERT_MANAGER_ISSUER_ANNOTATION_1>
+            <CERT_MANAGER_ISSUER_ANNOTATION_2>
+            <CERT_MANAGER_ISSUER_ANNOTATION_3>
+            <CERT_MANAGER_ISSUER_ANNOTATION_4>
+          hosts:
+          - host: pgadmin.<DOMAIN_NAME>
+            paths:
+            - path: /
+              pathType: Prefix
+          tls:
+          - secretName: pgadmin-tls
+            hosts:
+            - pgadmin.<DOMAIN_NAME>
+        persistentVolume:
+          enabled: false
+  destination:
+    name: in-cluster
+    namespace: pgadmin
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+---
+apiVersion: external-secrets.io/v1beta1
+kind: ExternalSecret
+metadata:
+  name: pgadmin-secrets
+  namespace: pgadmin
+  annotations:
+    argocd.argoproj.io/sync-wave: '0'
+spec:
+  dataFrom:
+    - extract:
+        key: /pgadmin
+  refreshInterval: 10s
+  secretStoreRef:
+    kind: ClusterSecretStore
+    name: vault-kv-secret
+  target:
+    name: pgadmin-secrets

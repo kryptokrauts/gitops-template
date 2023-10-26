@@ -2,6 +2,6 @@
 # added to this list so that its client id is added to the group in vault
 output "vault_identity_entity_ids" {
   value = [
-    # module.developer_one.vault_identity_entity_id,
+    module.mitch-lbw.vault_identity_entity_id,
   ]
 }

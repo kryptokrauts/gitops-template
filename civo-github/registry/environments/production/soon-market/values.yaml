@@ -1,0 +1,23 @@
+soon-market:
+  application:
+    appName: Soon.Market
+    logLevel: info
+    nftMarketWebApi: https://api.soon.market
+  ingress:
+    className: nginx
+    annotations:
+      <CERT_MANAGER_ISSUER_ANNOTATION_1>
+      <CERT_MANAGER_ISSUER_ANNOTATION_2>
+      <CERT_MANAGER_ISSUER_ANNOTATION_3>
+      <CERT_MANAGER_ISSUER_ANNOTATION_4>
+      nginx.ingress.kubernetes.io/service-upstream: "true"
+    hosts:
+    - host: soon-market.prd.<DOMAIN_NAME>
+      paths:
+      - path: /
+        pathType: Prefix
+    tls:
+    - secretName: soon-market-tls
+      hosts:
+        - soon-market.prd.<DOMAIN_NAME>
+

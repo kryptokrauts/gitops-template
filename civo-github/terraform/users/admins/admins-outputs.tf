@@ -3,6 +3,6 @@
 output "vault_identity_entity_ids" {
   value = [
     module.kbot.vault_identity_entity_id,
-    # module.admin_one.vault_identity_entity_id,
+    module.marc0olo.vault_identity_entity_id,
   ]
 }

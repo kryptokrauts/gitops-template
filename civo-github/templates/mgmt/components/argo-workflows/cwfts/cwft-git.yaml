@@ -6,6 +6,42 @@ metadata:
     argocd.argoproj.io/sync-wave: '55'
 spec:
   templates:
+    - name: checkout-with-gitops-ssh-revision
+      inputs:
+        parameters:
+          - name: appName
+          - name: revision
+          - name: gitUrlNoProtocol
+        artifacts:
+          - name: repo-source
+            path: '/src/{{inputs.parameters.appName}}'
+            git:
+              repo: '{{inputs.parameters.gitUrlNoProtocol}}/{{inputs.parameters.appName}}.git'
+              revision: '{{inputs.parameters.revision}}'
+              insecureIgnoreHostKey: true
+              sshPrivateKeySecret:
+                name: ci-secrets
+                key: SSH_PRIVATE_KEY
+          - name: gitops-source
+            path: /src/gitops
+            git:
+              repo: '{{inputs.parameters.gitUrlNoProtocol}}/gitops.git'
+              branch: 'main'
+              singleBranch: true
+              insecureIgnoreHostKey: true
+              sshPrivateKeySecret:
+                name: ci-secrets
+                key: SSH_PRIVATE_KEY
+      container:
+        image: golang:latest
+        command: ['/bin/sh', '-c']
+        args:
+          - ls -la /src &&
+            ls -la /src/{{inputs.parameters.appName}}
+      outputs:
+        artifacts:
+          - name: repo-source
+            path: /src
     - name: checkout-with-gitops-ssh
       inputs:
         parameters:
@@ -130,8 +166,8 @@ spec:
             echo "  UserKnownHostsFile /dev/null" >> $HOME/.ssh/config;
             chmod 0700 $HOME/.ssh/config;
 
-            git config --global user.email 'k-ray@example.com';
-            git config --global user.name 'kbot';
+            git config --global user.email 'kk-autobot@users.noreply.github.com';
+            git config --global user.name 'kk-autobot';
             git remote set-url origin '{{inputs.parameters.gitUrlNoProtocol}}/{{inputs.parameters.repoName}}.git';
             git remote -v;
             git status;
@@ -164,11 +200,11 @@ spec:
         args:
           - set -e;
 
-            git config --global user.email 'k-ray@example.com';
-            git config --global user.name 'kbot';
-            echo "set url to https://kbot:token@<GIT_PROVIDER>.com/the_rest_of_the input slug";
+            git config --global user.email 'kk-autobot@users.noreply.github.com';
+            git config --global user.name 'kk-autobot';
+            echo "set url to https://kk-autobot:token@<GIT_PROVIDER>.com/the_rest_of_the input slug";
             input_url='{{inputs.parameters.gitUrlNoProtocol}}/{{inputs.parameters.repoName}}.git';
-            origin_url="${input_url/"https://<GIT_PROVIDER>.com"/"https://kbot:$GIT_TOKEN@<GIT_PROVIDER>.com"}";   
+            origin_url="${input_url/"https://<GIT_PROVIDER>.com"/"https://kk-autobot:$GIT_TOKEN@<GIT_PROVIDER>.com"}";   
             git remote set-url origin $origin_url;
             git remote -v;
             git status;

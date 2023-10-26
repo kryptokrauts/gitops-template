@@ -1,0 +1,9 @@
+apiVersion: v2
+dependencies:
+  - name: soon-market
+    repository: http://chartmuseum.chartmuseum.svc.cluster.local:8080
+    version: v1.0.3
+description: soon-market frontend
+name: soon-market
+type: application
+version: 1.0.0

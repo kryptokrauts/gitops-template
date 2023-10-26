@@ -1,0 +1,19 @@
+soon-market-api:
+  application:
+    logLevel: DEBUG
+  ingress:
+    className: nginx
+    annotations:
+      <CERT_MANAGER_ISSUER_ANNOTATION_1>
+      <CERT_MANAGER_ISSUER_ANNOTATION_2>
+      <CERT_MANAGER_ISSUER_ANNOTATION_3>
+      <CERT_MANAGER_ISSUER_ANNOTATION_4>
+    hosts:
+    - host: soon-market-api.dev.<DOMAIN_NAME>
+      paths:
+      - path: /
+        pathType: Prefix
+    tls:
+    - secretName: soon-market-api-tls
+      hosts:
+      - soon-market-api.dev.<DOMAIN_NAME>

@@ -88,20 +88,6 @@ EOT
   depends_on = [vault_mount.secret]
 }
 
-resource "vault_generic_secret" "staging_metaphor" {
-  path = "secret/staging/metaphor"
-  # note: these secrets are not actually sensitive.
-  # do not hardcode passwords in git under normal circumstances.
-  data_json = <<EOT
-{
-  "SECRET_ONE" : "staging secret 1",
-  "SECRET_TWO" : "staging secret 2"
-}
-EOT
-
-  depends_on = [vault_mount.secret]
-}
-
 resource "vault_generic_secret" "production_metaphor" {
   path = "secret/production/metaphor"
   # note: these secrets are not actually sensitive.
@@ -177,6 +163,122 @@ resource "vault_generic_secret" "atlantis_secrets" {
       TF_VAR_vault_addr                   = "http://vault.vault.svc.cluster.local:8200",
       VAULT_TOKEN                         = var.vault_token,
       TF_VAR_vault_token                  = var.vault_token,
+    }
+  )
+
+  depends_on = [vault_mount.secret]
+}
+
+resource "random_password" "dev-postgres-admin" {
+  length           = 32
+  special          = true
+  override_special = "!#$"
+}
+
+resource "random_password" "dev-postgres-write-access" {
+  length           = 32
+  special          = true
+  override_special = "!#$"
+}
+
+resource "random_password" "dev-postgres-read-access" {
+  length           = 32
+  special          = true
+  override_special = "!#$"
+}
+
+resource "random_password" "dev-postgres-soony" {
+  length           = 32
+  special          = true
+  override_special = "!#$"
+}
+
+resource "vault_generic_secret" "dev-postgres-passwords" {
+  path = "secret/development/postgres"
+
+  data_json = jsonencode(
+    {
+      postgres-password         = random_password.dev-postgres-admin.result,
+      PG_WRITE_ACCESS_PASSWORD  = random_password.dev-postgres-write-access.result,
+      PG_READ_ACCESS_PASSWORD   = random_password.dev-postgres-read-access.result,
+      PG_SOONY_PASSWORD         = random_password.dev-postgres-soony.result,
+    }
+  )
+
+  depends_on = [vault_mount.secret]
+}
+
+resource "random_password" "prd-postgres-admin" {
+  length           = 32
+  special          = true
+  override_special = "!#$"
+}
+
+resource "random_password" "prd-postgres-write-access" {
+  length           = 32
+  special          = true
+  override_special = "!#$"
+}
+
+resource "random_password" "prd-postgres-read-access" {
+  length           = 32
+  special          = true
+  override_special = "!#$"
+}
+
+resource "random_password" "prd-postgres-soony" {
+  length           = 32
+  special          = true
+  override_special = "!#$"
+}
+
+resource "vault_generic_secret" "prd-postgres-passwords" {
+  path = "secret/production/postgres"
+
+  data_json = jsonencode(
+    {
+      postgres-password         = random_password.prd-postgres-admin.result,
+      PG_WRITE_ACCESS_PASSWORD  = random_password.prd-postgres-write-access.result,
+      PG_READ_ACCESS_PASSWORD   = random_password.prd-postgres-read-access.result,
+      PG_SOONY_PASSWORD         = random_password.prd-postgres-soony.result,
+    }
+  )
+
+  depends_on = [vault_mount.secret]
+}
+
+resource "random_password" "pgadmin" {
+  length           = 32
+  special          = true
+  override_special = "!#$"
+}
+
+resource "vault_generic_secret" "pgadmin-secrets" {
+  path = "secret/pgadmin"
+
+  data_json = jsonencode(
+    {
+      pgadmin-password = random_password.pgadmin.result,
+    }
+  )
+
+  depends_on = [vault_mount.secret]
+}
+
+resource "random_password" "grafana-admin" {
+  length           = 32
+  special          = true
+  override_special = "!#$"
+}
+
+
+resource "vault_generic_secret" "grafana-secrets" {
+  path = "secret/monitoring/grafana"
+
+  data_json = jsonencode(
+    {
+      admin-user = "admin"
+      admin-password = random_password.grafana-admin.result,
     }
   )
 
