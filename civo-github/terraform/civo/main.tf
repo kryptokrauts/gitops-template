@@ -51,8 +51,15 @@ resource "civo_kubernetes_cluster" "kubefirst" {
   pools {
     label      = local.cluster_name
     size       = "g4s.kube.medium"
-    node_count = 6
+    node_count = 3
   }
+}
+
+resource "civo_kubernetes_node_pool" "standard-nodes-large" {
+   cluster_id = civo_kubernetes_cluster.kubefirst.id
+   node_count = 1
+   size = "g4s.kube.large"
+   region = "<CLOUD_REGION>"
 }
 
 resource "local_file" "kubeconfig" {
