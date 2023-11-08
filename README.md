@@ -36,9 +36,6 @@ The [kubefirst cli](https://github.com/kubefirst/kubefirst) has established the 
 | Certificate Issuers      | clusterwide      | Let's Encrypt browser-trusted certificates  |                                    |
 | Chart Museum             | chartmuseum      | Helm Chart Registry                         | <CHARTMUSEUM_INGRESS_URL>          |
 | External Secrets         | external-secrets | Syncs Kubernetes secrets with Vault secrets |                                    |
-| Metaphor Development     | development      | Development instance of sample application  | <METAPHOR_DEVELOPMENT_INGRESS_URL> |
-| Metaphor Staging         | staging          | Staging instance of sample application      | <METAPHOR_STAGING_INGRESS_URL>     |
-| Metaphor Production      | production       | Production instance of sample application   | <METAPHOR_PRODUCTION_INGRESS_URL>  |
 | Nginx Ingress Controller | ingress-nginx    | Ingress Controller                          |                                    |
 | Vault                    | vault            | Secrets Management                          | <VAULT_INGRESS_URL>                |
 
