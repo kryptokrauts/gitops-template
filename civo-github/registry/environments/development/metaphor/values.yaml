@@ -17,16 +17,16 @@ metaphor:
       <CERT_MANAGER_ISSUER_ANNOTATION_4>
       nginx.ingress.kubernetes.io/service-upstream: "true"
     hosts:
-      - host: metaphor-development.<DOMAIN_NAME>
+      - host: metaphor.dev.<DOMAIN_NAME>
         paths:
           - path: /
             pathType: Prefix
     tls:
       - secretName: metaphor-tls
         hosts:
-          - metaphor-development.<DOMAIN_NAME>
+          - metaphor.dev.<DOMAIN_NAME>
   metaphor:
-    host: https://metaphor-development.<DOMAIN_NAME>/api
+    host: https://metaphor.dev.<DOMAIN_NAME>/api
     console: https://kubefirst.<DOMAIN_NAME>
 
   clusterSecretStoreName: <WORKLOAD_CLUSTER_NAME>-vault-kv-secret
