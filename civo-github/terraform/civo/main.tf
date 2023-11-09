@@ -55,11 +55,15 @@ resource "civo_kubernetes_cluster" "kubefirst" {
   }
 }
 
-resource "civo_kubernetes_node_pool" "standard-nodes-large" {
-   cluster_id = civo_kubernetes_cluster.kubefirst.id
-   node_count = 1
-   size = "g4s.kube.large"
-   region = "<CLOUD_REGION>"
+resource "civo_kubernetes_node_pool" "performance-nodes-small" {
+  cluster_id = civo_kubernetes_cluster.kubefirst.id
+  label = "performance-node"
+  node_count = 1
+  size = "g4p.kube.small"
+  region = "<CLOUD_REGION>"
+  labels = {
+    type  = "workflows"
+  }
 }
 
 resource "local_file" "kubeconfig" {
