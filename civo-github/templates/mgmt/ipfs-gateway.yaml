@@ -1,22 +1,22 @@
-# apiVersion: argoproj.io/v1alpha1
-# kind: Application
-# metadata:
-#   name: ipfs-gateway-components
-#   namespace: argocd
-#   annotations:
-#     argocd.argoproj.io/sync-wave: '50'
-# spec:
-#   project: default
-#   source:
-#     repoURL: <GITOPS_REPO_URL>
-#     path: registry/clusters/<CLUSTER_NAME>/components/ipfs-gateway
-#     targetRevision: HEAD
-#   destination:
-#     name: in-cluster
-#     namespace: ipfs-gateway
-#   syncPolicy:
-#     automated:
-#       prune: true
-#       selfHeal: true
-#     syncOptions:
-#       - CreateNamespace=true
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ipfs-gateway-components
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: '50'
+spec:
+  project: default
+  source:
+    repoURL: <GITOPS_REPO_URL>
+    path: registry/clusters/<CLUSTER_NAME>/components/ipfs-gateway
+    targetRevision: HEAD
+  destination:
+    name: in-cluster
+    namespace: ipfs-gateway
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
