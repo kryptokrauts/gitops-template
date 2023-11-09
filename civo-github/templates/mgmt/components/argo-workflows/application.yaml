@@ -19,9 +19,14 @@ spec:
               cpu: 200m
               memory: 256Mi
             limits:
-              cpu: 1
-              memory: 1024Mi
+              cpu: 2
+              memory: 4096Mi
+        controller:
+          nodeSelector:
+            type: workflows
         server:
+          nodeSelector:
+            type: workflows
           extraArgs:
           - --secure
           - --auth-mode=client
