@@ -4,7 +4,7 @@ metadata:
   name: prd-postgres
   namespace: argocd
   finalizers:
-  - resources-finalizer.argocd.argoproj.io
+    - resources-finalizer.argocd.argoproj.io
   annotations:
     argocd.argoproj.io/sync-wave: '45'
 spec:
@@ -114,6 +114,7 @@ data:
         fi
         echo "Created database: $db"
         grant_read_access "$db"
+        restore "$db"
       done
     }
 
@@ -128,6 +129,21 @@ data:
         ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON SEQUENCES TO "$ROLE_AND_USER_PRD_READ_ACCESS";
     EOSQL
       echo "Granted read-only access to database: $DATABASE"
+    }
+
+    # restore existing schema
+    # --no-acl: prevent restoration of access privileges (grant/revoke commands)
+    # -v: verbose mode output
+    function restore() {
+      local DATABASE=$1
+      local DUMPFILE="$BACKUP_DIRECTORY/$2.tar"
+
+      if [ -f "$DUMPFILE"]
+      then
+        echo "Restoring $DATABASE from dumpfile $DUMPFILE"
+        pg_restore -d $DATABASE --no-acl -v $DUMPFILE
+        echo "Finished restoring $DATABASE from dumpfile $DUMPFILE"
+      fi
     }
 
     echo "Executing custom initdb ..."
