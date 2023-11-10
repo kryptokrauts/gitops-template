@@ -80,8 +80,7 @@ spec:
         resources:
           {}
 
-        nodeSelector:
-          type: workflows
+        nodeSelector: {}
 
         tolerations: []
 
