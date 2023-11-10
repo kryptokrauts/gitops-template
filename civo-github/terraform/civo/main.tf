@@ -71,21 +71,21 @@ resource "civo_kubernetes_node_pool" "workflows-standard-large" {
   }
 }
 
-resource "civo_kubernetes_node_pool" "workflows-performance-small" {
-  cluster_id = civo_kubernetes_cluster.kubefirst.id
-  label = "workflows-performance-small"
-  node_count = 0
-  size = "g4p.kube.small"
-  region = "<CLOUD_REGION>"
-  labels = {
-    purpose  = "workflows"
-  }
-  taint {
-    key = "workflow-executor"
-    value = "true"
-    effect = "NoSchedule"
-  }
-}
+# resource "civo_kubernetes_node_pool" "workflows-performance-small" {
+#   cluster_id = civo_kubernetes_cluster.kubefirst.id
+#   label = "workflows-performance-small"
+#   node_count = 1
+#   size = "g4p.kube.small"
+#   region = "<CLOUD_REGION>"
+#   labels = {
+#     purpose  = "workflows"
+#   }
+#   taint {
+#     key = "workflow-executor"
+#     value = "true"
+#     effect = "NoSchedule"
+#   }
+# }
 
 resource "local_file" "kubeconfig" {
   content  = civo_kubernetes_cluster.kubefirst.kubeconfig
