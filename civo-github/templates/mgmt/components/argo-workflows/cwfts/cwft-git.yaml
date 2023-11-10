@@ -7,13 +7,13 @@ metadata:
 spec:
   templates:
     - name: checkout-with-gitops-ssh-revision
-      nodeSelector:
-        purpose: workflows
-      tolerations:
-        - key: "workflow-executor"
-          operator: "Equal"
-          value: "true"
-          effect: "NoSchedule"
+      # nodeSelector:
+      #   purpose: workflows
+      # tolerations:
+      #   - key: "workflow-executor"
+      #     operator: "Equal"
+      #     value: "true"
+      #     effect: "NoSchedule"
       inputs:
         parameters:
           - name: appName
@@ -50,13 +50,13 @@ spec:
           - name: repo-source
             path: /src
     - name: checkout-with-gitops-ssh
-      nodeSelector:
-        purpose: workflows
-      tolerations:
-        - key: "workflow-executor"
-          operator: "Equal"
-          value: "true"
-          effect: "NoSchedule"
+      # nodeSelector:
+      #   purpose: workflows
+      # tolerations:
+      #   - key: "workflow-executor"
+      #     operator: "Equal"
+      #     value: "true"
+      #     effect: "NoSchedule"
       inputs:
         parameters:
           - name: appName
@@ -95,13 +95,13 @@ spec:
           - name: repo-source
             path: /src
     - name: checkout-with-gitops-https
-      nodeSelector:
-        purpose: workflows
-      tolerations:
-        - key: "workflow-executor"
-          operator: "Equal"
-          value: "true"
-          effect: "NoSchedule"
+      # nodeSelector:
+      #   purpose: workflows
+      # tolerations:
+      #   - key: "workflow-executor"
+      #     operator: "Equal"
+      #     value: "true"
+      #     effect: "NoSchedule"
       inputs:
         parameters:
           - name: appName
@@ -146,13 +146,13 @@ spec:
           - name: repo-source
             path: /src
     - name: pull-commit-push-ssh
-      nodeSelector:
-        purpose: workflows
-      tolerations:
-        - key: "workflow-executor"
-          operator: "Equal"
-          value: "true"
-          effect: "NoSchedule"
+      # nodeSelector:
+      #   purpose: workflows
+      # tolerations:
+      #   - key: "workflow-executor"
+      #     operator: "Equal"
+      #     value: "true"
+      #     effect: "NoSchedule"
       retryStrategy:        
         limit: '5'
       # todo get ssh item not all secrets
@@ -204,13 +204,13 @@ spec:
             git commit -m "{{inputs.parameters.commitMessage}}"  || echo "Assuming this was committed on previous run, not erroring out" ;
             git push;
     - name: pull-commit-push-https
-      nodeSelector:
-        purpose: workflows
-      tolerations:
-        - key: "workflow-executor"
-          operator: "Equal"
-          value: "true"
-          effect: "NoSchedule"
+      # nodeSelector:
+      #   purpose: workflows
+      # tolerations:
+      #   - key: "workflow-executor"
+      #     operator: "Equal"
+      #     value: "true"
+      #     effect: "NoSchedule"
       retryStrategy:
         limit: '5'
       # todo get ssh item not all secrets

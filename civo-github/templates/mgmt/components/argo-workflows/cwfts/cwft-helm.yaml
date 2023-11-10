@@ -7,13 +7,13 @@ metadata:
 spec:
   templates:
   - name: get-chart-version
-    nodeSelector:
-      purpose: workflows
-    tolerations:
-      - key: "workflow-executor"
-        operator: "Equal"
-        value: "true"
-        effect: "NoSchedule"
+    # nodeSelector:
+    #   purpose: workflows
+    # tolerations:
+    #   - key: "workflow-executor"
+    #     operator: "Equal"
+    #     value: "true"
+    #     effect: "NoSchedule"
     inputs:
       artifacts:
         - name: repo-source
@@ -31,13 +31,13 @@ spec:
             chart_yaml = yaml.load(f, Loader=yaml.FullLoader)
             print(chart_yaml['version'])
   - name: set-chart-versions
-    nodeSelector:
-      purpose: workflows
-    tolerations:
-      - key: "workflow-executor"
-        operator: "Equal"
-        value: "true"
-        effect: "NoSchedule"
+    # nodeSelector:
+    #   purpose: workflows
+    # tolerations:
+    #   - key: "workflow-executor"
+    #     operator: "Equal"
+    #     value: "true"
+    #     effect: "NoSchedule"
     inputs:
       artifacts:
         - name: repo-source
@@ -65,13 +65,13 @@ spec:
         - name: repo-source
           path: /src
   - name: publish-chart
-    nodeSelector:
-      purpose: workflows
-    tolerations:
-      - key: "workflow-executor"
-        operator: "Equal"
-        value: "true"
-        effect: "NoSchedule"
+    # nodeSelector:
+    #   purpose: workflows
+    # tolerations:
+    #   - key: "workflow-executor"
+    #     operator: "Equal"
+    #     value: "true"
+    #     effect: "NoSchedule"
     retryStrategy:
       limit: '5'
     inputs:
@@ -100,13 +100,13 @@ spec:
             name: ci-secrets
             key: BASIC_AUTH_USER
   - name: set-environment-version
-    nodeSelector:
-      purpose: workflows
-    tolerations:
-      - key: "workflow-executor"
-        operator: "Equal"
-        value: "true"
-        effect: "NoSchedule"
+    # nodeSelector:
+    #   purpose: workflows
+    # tolerations:
+    #   - key: "workflow-executor"
+    #     operator: "Equal"
+    #     value: "true"
+    #     effect: "NoSchedule"
     inputs:
       artifacts:
         - name: repo-source
@@ -129,13 +129,13 @@ spec:
         - name: repo-source
           path: /src
   - name: increment-chart-minor
-    nodeSelector:
-      purpose: workflows
-    tolerations:
-      - key: "workflow-executor"
-        operator: "Equal"
-        value: "true"
-        effect: "NoSchedule"
+    # nodeSelector:
+    #   purpose: workflows
+    # tolerations:
+    #   - key: "workflow-executor"
+    #     operator: "Equal"
+    #     value: "true"
+    #     effect: "NoSchedule"
     inputs:
       artifacts:
         - name: repo-source
