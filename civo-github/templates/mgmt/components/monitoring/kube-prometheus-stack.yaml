@@ -91,19 +91,19 @@ spec:
             plugins:
               enable_alpha: true
             # https://grafana.com/docs/grafana/latest/setup-grafana/configure-security/configure-authentication/github/#steps
-            auth.github:
-              enabled: false
-              # TODO: add manually to secret in vault
-              client_id: $__file{/etc/secrets/GITHUB_CLIENT_ID}
-              client_secret: $__file{/etc/secrets/GITHUB_CLIENT_SECRET}
-              scopes: user:email,read:org
-              auth_url: https://github.com/login/oauth/authorize
-              token_url: https://github.com/login/oauth/access_token
-              api_url: https://api.github.com/user
-              allow_sign_up: true
-              allowed_organizations: kryptokrauts
-              role_attribute_path: contains(groups[*], '@kryptokrauts/grafana-admins') && 'GrafanaAdmin' || 'Viewer'
-              allow_assign_grafana_admin: true
+            # auth.github:
+            #   enabled: true
+            #   # TODO: add manually to secret in vault
+            #   client_id: $__file{/etc/secrets/GITHUB_CLIENT_ID}
+            #   client_secret: $__file{/etc/secrets/GITHUB_CLIENT_SECRET}
+            #   scopes: user:email,read:org
+            #   auth_url: https://github.com/login/oauth/authorize
+            #   token_url: https://github.com/login/oauth/access_token
+            #   api_url: https://api.github.com/user
+            #   allow_sign_up: true
+            #   allowed_organizations: kryptokrauts
+            #   role_attribute_path: contains(groups[*], '@kryptokrauts/grafana-admins') && 'GrafanaAdmin' || 'Viewer'
+            #   allow_assign_grafana_admin: true
           ingress:
             enabled: true
             ingressClassName: nginx
@@ -113,10 +113,9 @@ spec:
               <CERT_MANAGER_ISSUER_ANNOTATION_3>
               <CERT_MANAGER_ISSUER_ANNOTATION_4>
             hosts:
-            - host: grafana.<DOMAIN_NAME>
-              paths:
-              - path: /
-                pathType: Prefix
+            - grafana.<DOMAIN_NAME>
+            path: /
+            pathType: Prefix
             tls:
             - secretName: grafana-tls
               hosts:
@@ -124,19 +123,19 @@ spec:
           plugins:
             - grafana-piechart-panel
           dashboardProviders:
-          dashboardproviders.yaml:
-            apiVersion: 1
-            providers:
-            - name: 'tools'
-              orgId: 1
-              folder: 'Tools'
-              type: file
-              disableDeletion: true
-              editable: true
-              options:
-                path: /var/lib/grafana/dashboards/tools
+            dashboardproviders.yaml:
+              apiVersion: 1
+              providers:
+              - name: 'default'
+                orgId: 1
+                folder:
+                type: file
+                disableDeletion: true
+                editable: true
+                options:
+                  path: /var/lib/grafana/dashboards/default
           dashboards:
-            tools:
+            default:
               argocd:
                 gnetId: 14584
                 revision: 1
@@ -168,10 +167,10 @@ spec:
               <CERT_MANAGER_ISSUER_ANNOTATION_3>
               <CERT_MANAGER_ISSUER_ANNOTATION_4>
             hosts:
-            - host: alertmanager.<DOMAIN_NAME>
-              paths:
-              - path: /
-                pathType: Prefix
+            - alertmanager.<DOMAIN_NAME>
+            paths:
+            - /
+            pathType: Prefix
             tls:
             - secretName: alertmanager-tls
               hosts:
@@ -279,3 +278,5 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+      # https://www.arthurkoziel.com/fixing-argocd-crd-too-long-error/
+      - ServerSideApply=true
