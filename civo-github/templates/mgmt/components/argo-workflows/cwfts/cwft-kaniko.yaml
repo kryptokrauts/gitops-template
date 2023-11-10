@@ -6,6 +6,13 @@ spec:
   entrypoint: build-push
   templates:
   - name: build-push-ssh
+    nodeSelector:
+      purpose: workflows
+    tolerations:
+      - key: "workflow-executor"
+        operator: "Equal"
+        value: "true"
+        effect: "NoSchedule"
     inputs:
       parameters:
       - name: appName
@@ -43,6 +50,13 @@ spec:
       - '--destination'
       - '{{inputs.parameters.containerRegistryURL}}'
   - name: build-push-ssh-revision
+    nodeSelector:
+      purpose: workflows
+    tolerations:
+      - key: "workflow-executor"
+        operator: "Equal"
+        value: "true"
+        effect: "NoSchedule"
     inputs:
       parameters:
       - name: appName
@@ -79,6 +93,13 @@ spec:
       - '--destination'
       - '{{inputs.parameters.containerRegistryURL}}'
   - name: build-push-https
+    nodeSelector:
+      purpose: workflows
+    tolerations:
+      - key: "workflow-executor"
+        operator: "Equal"
+        value: "true"
+        effect: "NoSchedule"
     inputs:
       parameters:
       - name: appName

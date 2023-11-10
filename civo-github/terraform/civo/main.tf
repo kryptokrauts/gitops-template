@@ -55,14 +55,35 @@ resource "civo_kubernetes_cluster" "kubefirst" {
   }
 }
 
-resource "civo_kubernetes_node_pool" "performance-nodes-small" {
+resource "civo_kubernetes_node_pool" "workflows-standard-large" {
   cluster_id = civo_kubernetes_cluster.kubefirst.id
-  label = "performance-node"
+  label = "workflows-standard-large"
   node_count = 1
+  size = "g4s.kube.large"
+  region = "<CLOUD_REGION>"
+  labels = {
+    purpose  = "workflows"
+  }
+  taint {
+    key = "workflow-executor"
+    value = "true"
+    effect = "NoSchedule"
+  }
+}
+
+resource "civo_kubernetes_node_pool" "workflows-performance-small" {
+  cluster_id = civo_kubernetes_cluster.kubefirst.id
+  label = "workflows-performance-small"
+  node_count = 0
   size = "g4p.kube.small"
   region = "<CLOUD_REGION>"
   labels = {
-    type  = "workflows"
+    purpose  = "workflows"
+  }
+  taint {
+    key = "workflow-executor"
+    value = "true"
+    effect = "NoSchedule"
   }
 }
 
