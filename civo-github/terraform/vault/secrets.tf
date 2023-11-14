@@ -175,13 +175,25 @@ resource "random_password" "dev-postgres-admin" {
   override_special = "!#$"
 }
 
-resource "random_password" "dev-postgres-write-access" {
+resource "random_password" "dev-postgres-read-access" {
   length           = 32
   special          = true
   override_special = "!#$"
 }
 
-resource "random_password" "dev-postgres-read-access" {
+resource "random_password" "dev-postgres-soon-market-internal" {
+  length           = 32
+  special          = true
+  override_special = "!#$"
+}
+
+resource "random_password" "dev-postgres-soon-market-api" {
+  length           = 32
+  special          = true
+  override_special = "!#$"
+}
+
+resource "random_password" "dev-postgres-apicurio-registry" {
   length           = 32
   special          = true
   override_special = "!#$"
@@ -198,49 +210,12 @@ resource "vault_generic_secret" "dev-postgres-passwords" {
 
   data_json = jsonencode(
     {
-      postgres-password         = random_password.dev-postgres-admin.result,
-      PG_WRITE_ACCESS_PASSWORD  = random_password.dev-postgres-write-access.result,
-      PG_READ_ACCESS_PASSWORD   = random_password.dev-postgres-read-access.result,
-      PG_SOONY_PASSWORD         = random_password.dev-postgres-soony.result,
-    }
-  )
-
-  depends_on = [vault_mount.secret]
-}
-
-resource "random_password" "prd-postgres-admin" {
-  length           = 32
-  special          = true
-  override_special = "!#$"
-}
-
-resource "random_password" "prd-postgres-write-access" {
-  length           = 32
-  special          = true
-  override_special = "!#$"
-}
-
-resource "random_password" "prd-postgres-read-access" {
-  length           = 32
-  special          = true
-  override_special = "!#$"
-}
-
-resource "random_password" "prd-postgres-soony" {
-  length           = 32
-  special          = true
-  override_special = "!#$"
-}
-
-resource "vault_generic_secret" "prd-postgres-passwords" {
-  path = "secret/production/postgres"
-
-  data_json = jsonencode(
-    {
-      postgres-password         = random_password.prd-postgres-admin.result,
-      PG_WRITE_ACCESS_PASSWORD  = random_password.prd-postgres-write-access.result,
-      PG_READ_ACCESS_PASSWORD   = random_password.prd-postgres-read-access.result,
-      PG_SOONY_PASSWORD         = random_password.prd-postgres-soony.result,
+      postgres-password                 = random_password.dev-postgres-admin.result,
+      PG_READ_ACCESS_PASSWORD           = random_password.dev-postgres-read-access.result,
+      PG_SOON_MARKET_INTERNAL_PASSWORD  = random_password.dev-postgres-soon-market-internal.result,
+      PG_SOON_MARKET_API_PASSWORD       = random_password.dev-postgres-soon-market-api.result,
+      PG_APICURIO_REGISTRY_PASSWORD     = random_password.dev-postgres-apicurio-registry.result,
+      PG_SOONY_PASSWORD                 = random_password.dev-postgres-soony.result,
     }
   )
 

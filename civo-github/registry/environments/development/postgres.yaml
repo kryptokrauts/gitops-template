@@ -22,7 +22,7 @@ spec:
             scriptsConfigMap: postgres-initdb
           extraEnvVarsSecret: postgres-secrets
   destination:
-    name: in-cluster
+    name: <WORKLOAD_CLUSTER_NAME>
     namespace: development
   syncPolicy:
     automated:
@@ -61,76 +61,56 @@ data:
     set -e
     set -u
 
+    USER_POSTGRES=postgres
+
     # use admin password from env to execute psql commands
     export PGPASSWORD="$POSTGRES_PASSWORD"
 
-    USER_POSTGRES=postgres
-    USER_DEV_SOONY=dev-soony
-
     # we created a special readonly user that will be granted rights to view all databases
-    ROLE_AND_USER_DEV_READ_ACCESS=dev-read-access
-
-    function create_users() {
-      local USERS=(
-        "dev-write-access"
-        "$USER_DEV_SOONY")
-      local USER_PASSWORDS=(
-        "$PG_WRITE_ACCESS_PASSWORD"
-        "$PG_SOONY_PASSWORD")
-
-      echo "Creating ${#USERS[@]} users..."
-      local USER_INDEX=0
-      for user in ${USERS[@]}; do
-        psql -v ON_ERROR_STOP=1 --username "$USER_POSTGRES" <<-EOSQL
-          CREATE USER "$user" WITH PASSWORD '${USER_PASSWORDS[USER_INDEX]}';
-    EOSQL
-        USER_INDEX=${USER_INDEX}+1
-        echo "Created user: $user"
-      done
-    }
+    ROLE_AND_USER_READ_ACCESS=read-access
 
     function create_read_role_and_user() {
       echo "Creating read-only role (with user) to access to all databases within the cluster..."
       psql -v ON_ERROR_STOP=1 --username "$USER_POSTGRES" <<-EOSQL
-        CREATE ROLE "$ROLE_AND_USER_DEV_READ_ACCESS" WITH LOGIN NOINHERIT NOCREATEDB NOCREATEROLE NOSUPERUSER PASSWORD '${PG_READ_ACCESS_PASSWORD}';
+        CREATE ROLE "$ROLE_AND_USER_READ_ACCESS" WITH LOGIN NOINHERIT NOCREATEDB NOCREATEROLE NOSUPERUSER PASSWORD '${PG_READ_ACCESS_PASSWORD}';
     EOSQL
     }
 
-    function create_databases_with_and_set_grant_privileges() {
+    function create_databases_and_grant_privileges() {
       local DATABASES=(
-        "soon-market-backend"
-        "soony")
+        "APICURIO_REGISTRY"
+        "SOON_MARKET_INTERNAL"
+        "SOON_MARKET_API"
+        "SOONY")
 
       echo "Creating ${#DATABASES[@]} databases"
       for db in ${DATABASES[@]}; do
         psql -v ON_ERROR_STOP=1 --username "$USER_POSTGRES" <<-EOSQL
           CREATE DATABASE "$db";
     EOSQL
-        if [ "$db" = "soony" ]
-        then
-          psql -v ON_ERROR_STOP=1 --username "$USER_POSTGRES" <<-EOSQL
-            GRANT ALL PRIVILEGES ON DATABASE "$db" TO "$USER_DEV_SOONY";
+        # secret in vault must follow this pattern
+        userpw="PG_${db}_PASSWORD"
+        psql -v ON_ERROR_STOP=1 --username "$USER_POSTGRES" <<-EOSQL
+          CREATE USER "$db" WITH PASSWORD '${!userpw}';
     EOSQL
         fi
-        echo "Created database: $db"
+        echo "Created database & user: $db"
         grant_read_access "$db"
       done
     }
 
     # grant read access within given database, schema public
-    # create function for checking HTTP method
     function grant_read_access() {
       local DATABASE=$1
       psql -v ON_ERROR_STOP=1 --username "$USER_POSTGRES" -d "$DATABASE" <<-EOSQL
-        GRANT CONNECT ON DATABASE "$DATABASE" TO "$ROLE_AND_USER_DEV_READ_ACCESS";
-        GRANT USAGE ON SCHEMA public TO "$ROLE_AND_USER_DEV_READ_ACCESS";
-        ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO "$ROLE_AND_USER_DEV_READ_ACCESS";
-        ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON SEQUENCES TO "$ROLE_AND_USER_DEV_READ_ACCESS";
+        GRANT CONNECT ON DATABASE "$DATABASE" TO "$ROLE_AND_USER_READ_ACCESS";
+        GRANT USAGE ON SCHEMA public TO "$ROLE_AND_USER_READ_ACCESS";
+        ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO "$ROLE_AND_USER_READ_ACCESS";
+        ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON SEQUENCES TO "$ROLE_AND_USER_READ_ACCESS";
     EOSQL
       echo "Granted read-only access to database: $DATABASE"
     }
 
     echo "Executing custom initdb ..."
-    create_users
     create_read_role_and_user
-    create_databases_with_and_set_grant_privileges
+    create_databases_and_grant_privileges
