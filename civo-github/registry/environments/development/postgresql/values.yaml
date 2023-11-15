@@ -1,0 +1,9 @@
+postgresql:
+  auth:
+    existingSecret: postgres-secrets
+  primary:
+    initdb:
+      scriptsConfigMap: postgres-initdb
+    extraEnvVarsSecret: postgres-secrets
+
+clusterSecretStoreName: <WORKLOAD_CLUSTER_NAME>-vault-kv-secret

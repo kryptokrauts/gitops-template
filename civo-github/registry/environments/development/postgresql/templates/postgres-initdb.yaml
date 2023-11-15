@@ -1,59 +1,7 @@
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: dev-postgres
-  namespace: argocd
-  finalizers:
-  - resources-finalizer.argocd.argoproj.io
-  annotations:
-    argocd.argoproj.io/sync-wave: '45'
-spec:
-  project: default
-  source:
-    repoURL: 'https://charts.bitnami.com/bitnami'
-    chart: postgresql
-    targetRevision: 13.1.4
-    helm:
-      values: |-
-        auth:
-          existingSecret: postgres-secrets
-        primary:
-          initdb:
-            scriptsConfigMap: postgres-initdb
-          extraEnvVarsSecret: postgres-secrets
-  destination:
-    name: <WORKLOAD_CLUSTER_NAME>
-    namespace: development
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-    syncOptions:
-      - CreateNamespace=true
----
-apiVersion: external-secrets.io/v1beta1
-kind: ExternalSecret
-metadata:
-  name: postgres-secrets
-  namespace: development
-  annotations:
-    argocd.argoproj.io/sync-wave: '0'
-spec:
-  dataFrom:
-    - extract:
-        key: /development/postgres
-  refreshInterval: 10s
-  secretStoreRef:
-    kind: ClusterSecretStore
-    name: vault-kv-secret
-  target:
-    name: postgres-secrets
----
 kind: ConfigMap
 apiVersion: v1
 metadata:
   name: postgres-initdb
-  namespace: development
 data:
   init.sh: |
     #!/bin/bash
