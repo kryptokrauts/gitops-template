@@ -51,33 +51,33 @@ resource "civo_kubernetes_cluster" "kubefirst" {
   pools {
     label      = local.cluster_name
     size       = "g4s.kube.medium"
-    node_count = 4
+    node_count = 6
   }
 }
 
-resource "civo_kubernetes_node_pool" "kubefirst-standard-large" {
-  cluster_id = civo_kubernetes_cluster.kubefirst.id
-  label = "kubefirst-standard-large"
-  node_count = 1
-  size = "g4s.kube.large"
-  region = "<CLOUD_REGION>"
-}
+# resource "civo_kubernetes_node_pool" "kubefirst-standard-large" {
+#   cluster_id = civo_kubernetes_cluster.kubefirst.id
+#   label = "kubefirst-standard-large"
+#   node_count = 1
+#   size = "g4s.kube.large"
+#   region = "<CLOUD_REGION>"
+# }
 
-resource "civo_kubernetes_node_pool" "workflows-standard-large" {
-  cluster_id = civo_kubernetes_cluster.kubefirst.id
-  label = "workflows-standard-large"
-  node_count = 1
-  size = "g4s.kube.large"
-  region = "<CLOUD_REGION>"
-  labels = {
-    purpose  = "workflows"
-  }
-  taint {
-    key = "workflow-executor"
-    value = "true"
-    effect = "NoSchedule"
-  }
-}
+# resource "civo_kubernetes_node_pool" "workflows-standard-large" {
+#   cluster_id = civo_kubernetes_cluster.kubefirst.id
+#   label = "workflows-standard-large"
+#   node_count = 1
+#   size = "g4s.kube.large"
+#   region = "<CLOUD_REGION>"
+#   labels = {
+#     purpose  = "workflows"
+#   }
+#   taint {
+#     key = "workflow-executor"
+#     value = "true"
+#     effect = "NoSchedule"
+#   }
+# }
 
 # resource "civo_kubernetes_node_pool" "workflows-performance-small" {
 #   cluster_id = civo_kubernetes_cluster.kubefirst.id
