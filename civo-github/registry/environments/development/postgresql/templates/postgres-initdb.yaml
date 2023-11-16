@@ -40,6 +40,7 @@ data:
         userpw="PG_${db}_PASSWORD"
         psql -v ON_ERROR_STOP=1 --username "$USER_POSTGRES" <<-EOSQL
           CREATE USER "$db" WITH PASSWORD '${!userpw}';
+          GRANT ALL PRIVILEGES ON DATABASE "$db" TO "$db";
     EOSQL
         echo "Created database & user: $db"
         grant_read_access "$db"
