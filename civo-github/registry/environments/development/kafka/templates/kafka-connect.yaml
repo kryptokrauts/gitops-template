@@ -1,0 +1,71 @@
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: kafka-connect
+# spec:
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       app.kubernetes.io/component: kafka-connect
+#   template:
+#     metadata:
+#       labels:
+#         app.kubernetes.io/component: kafka-connect
+#     spec:
+#       imagePullSecrets:
+#         - name: docker-config
+#       containers:
+#         - name: kafka-connect
+#           image: "{{ .Values.kafkaConnect.image.repository }}:{{ .Values.kafkaConnect.image.tag }}"
+#           imagePullPolicy: {{ .Values.kafkaConnect.image.pullPolicy }}
+#           ports:
+#             - name: connector
+#               containerPort: 8083
+#           volumeMounts:
+#             - name: config-volume
+#               mountPath: /opt/bitnami/kafka/config/connect.properties
+#               subPath: connect.properties
+#       volumes:
+#         - name: config-volume
+#           configMap:
+#             name: kafka-connect-config
+# ---
+# apiVersion: v1
+# kind: ConfigMap
+# metadata:
+#   name: kafka-connect-config
+# data:
+#   connect.properties: |
+#     bootstrap.servers=dev-kafka.development.svc:9092
+#     group.id={{ .Values.kafkaConnect.config.groupId }}
+#     key.converter=org.apache.kafka.connect.storage.StringConverter
+#     key.converter.schemas.enable=false
+#     value.converter=io.apicurio.registry.utils.converter.AvroConverter
+#     value.converter.schemas.enable=true
+#     value.converter.schema.registry.url=http://apicurio-registry.development.svc:8080/apis/registry/v2
+#     value.converter.apicurio.registry.converter.serializer=io.apicurio.registry.serde.avro.AvroKafkaSerializer
+#     value.converter.apicurio.registry.converter.deserializer=io.apicurio.registry.serde.avro.AvroKafkaDeserializer
+
+#     offset.storage.topic={{ .Values.kafkaConnect.config.configStorageTopic }}
+#     config.storage.topic={{ .Values.kafkaConnect.config.offsetStorageTopic }}
+#     status.storage.topic={{ .Values.kafkaConnect.config.statusStorageTopic }}
+
+#     consumer.max.poll.records={{ .Values.kafkaConnect.config.consumerMaxPollRecords }}
+#     consumer.enable.auto.commit={{ .Values.kafkaConnect.config.consumerEnableAutoCommit }}
+#     consumer.auto.offset.reset={{ .Values.kafkaConnect.config.consumerAutoOffsetReset }}
+
+#     plugin.path={{ .Values.kafkaConnect.config.pluginPath }}
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: kafka-connect
+#   labels:
+#     app.kubernetes.io/component: kafka-connect
+# spec:
+#   ports:
+#     - protocol: TCP
+#       port: 8083
+#       targetPort: connector
+#   selector:
+#     app.kubernetes.io/component: kafka-connect

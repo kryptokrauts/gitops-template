@@ -55,13 +55,13 @@ resource "civo_kubernetes_cluster" "kubefirst" {
   }
 }
 
-# resource "civo_kubernetes_node_pool" "kubefirst-standard-large" {
-#   cluster_id = civo_kubernetes_cluster.kubefirst.id
-#   label = "kubefirst-standard-large"
-#   node_count = 1
-#   size = "g4s.kube.large"
-#   region = "<CLOUD_REGION>"
-# }
+resource "civo_kubernetes_node_pool" "kubefirst-standard-large" {
+  cluster_id = civo_kubernetes_cluster.kubefirst.id
+  label = "kubefirst-standard-large"
+  node_count = 1
+  size = "g4s.kube.large"
+  region = "<CLOUD_REGION>"
+}
 
 resource "civo_kubernetes_node_pool" "workflows-standard-large" {
   cluster_id = civo_kubernetes_cluster.kubefirst.id

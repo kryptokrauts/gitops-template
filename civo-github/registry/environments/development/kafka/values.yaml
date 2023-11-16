@@ -1,0 +1,53 @@
+clusterSecretStoreName: <WORKLOAD_CLUSTER_NAME>-vault-kv-secret
+
+kafka:
+  controller:
+    nodeSelector: {}
+    tolerations: []
+    replicaCount: 2
+    persistence:
+      existingClaim: ""
+      size: 5Gi
+  broker:
+    nodeSelector: {}
+    tolerations: []
+    persistence:
+      existingClaim: ""
+      size: 5Gi
+  metrics:
+    kafka:
+      enabled: false
+  kraft:
+    enabled: true
+    # https://sleeplessbeastie.eu/2021/10/22/how-to-generate-kafka-cluster-id/
+    clusterId: "MmY3ZjU2YTYxMzU0NGM4Nm" # If not set, a random cluster ID will be generated
+    controllerQuorumVoters: "" # If not set, it will be automatically configured to use all controller-elegible nodes.
+  provisioning:
+    enabled: true
+    replicationFactor: 2
+    topics:
+      - name: xpr-network.atomicmarket.raw
+      - name: xpr-network.atomicmarket.structured
+
+kafkaConnect:
+  image:
+    repository: ghcr.io/kryptokrauts/kafka-connect
+    tag: v1.1.0
+    pullPolicy: IfNotPresent
+  config:
+    groupId: kafka-connect-xpr
+    configStorageTopic: kafka-connect-xpr-config
+    offsetStorageTopic: kafka-connect-xpr-offset
+    statusStorageTopic: kafka-connect-xpr-status
+    consumerMaxPollRecords: 1
+    consumerEnableAutoCommit: false
+    consumerAutoOffsetReset: latest
+    pluginPath: /opt/bitnami/kafka/plugins,/opt/bitnami/kafka/libs
+
+apicurioRegistry:
+  image:
+    repository: apicurio/apicurio-registry-sql
+    tag: 2.5.0.Final
+    pullPolicy: IfNotPresent
+  env:
+    uiFeaturesReadonly: false

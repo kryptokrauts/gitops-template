@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: apicurio-registry
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: apicurio-registry
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: apicurio-registry
+    spec:
+      containers:
+        - name: apicurio-registry
+          image: "{{ .Values.apicurioRegistry.image.repository }}:{{ .Values.apicurioRegistry.image.tag }}"
+          imagePullPolicy: {{ .Values.apicurioRegistry.image.pullPolicy }}
+          envFrom:
+          - secretRef:
+              name: apicurio-registry
+          env:
+          - name: REGISTRY_DATASOURCE_URL
+            value: jdbc:postgresql://dev-postgresql.development.svc:5432/APICURIO_REGISTRY
+          - name: REGISTRY_DATASOURCE_USERNAME
+            value: APICURIO_REGISTRY
+          - name: REGISTRY_UI_FEATURES_READONLY
+            value: "{{ .Values.apicurioRegistry.env.uiFeaturesReadonly }}"
+          - name: REGISTRY_RULES_GLOBAL_VALIDITY
+            value: FULL
+          - name: REGISTRY_RULES_GLOBAL_COMPATIBILITY
+            value: FULL_TRANSITIVE
+---
+apiVersion: external-secrets.io/v1alpha1
+kind: ExternalSecret
+metadata:
+  name: apicurio-registry
+spec:
+  target:
+    name: apicurio-registry
+  secretStoreRef:
+    kind: ClusterSecretStore
+    name: <WORKLOAD_CLUSTER_NAME>-vault-kv-secret
+  refreshInterval: 10s
+  data:
+    - remoteRef:
+        key: development/postgres
+        property: PG_APICURIO_REGISTRY_PASSWORD
+      secretKey: REGISTRY_DATASOURCE_PASSWORD
