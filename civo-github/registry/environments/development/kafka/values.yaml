@@ -1,6 +1,18 @@
 clusterSecretStoreName: <WORKLOAD_CLUSTER_NAME>-vault-kv-secret
 
 kafka:
+  listeners:
+    client:
+      protocol: PLAINTEXT
+    controller:
+      protocol: PLAINTEXT
+    interbroker:
+      protocol: PLAINTEXT
+    external:
+      protocol: PLAINTEXT
+  extraConfig: |
+    offsets.topic.replication.factor=2
+    transaction.state.log.replication.factor=2
   controller:
     nodeSelector: {}
     tolerations: []
@@ -26,8 +38,9 @@ kafka:
     enabled: true
     replicationFactor: 2
     topics:
+      - name: xpr-network.fork.avro
       - name: xpr-network.atomicmarket.raw
-      - name: xpr-network.atomicmarket.structured
+      - name: xpr-network.atomicmarket.avro
 
 kafkaConnect:
   image:

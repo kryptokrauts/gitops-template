@@ -47,3 +47,17 @@ spec:
         key: development/postgres
         property: PG_APICURIO_REGISTRY_PASSWORD
       secretKey: REGISTRY_DATASOURCE_PASSWORD
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: apicurio-registry
+  labels:
+    app.kubernetes.io/component: apicurio-registry
+spec:
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+  selector:
+    app.kubernetes.io/component: apicurio-registry
