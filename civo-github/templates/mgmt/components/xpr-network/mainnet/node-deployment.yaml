@@ -1,0 +1,90 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: node
+  labels:
+    app: node
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: node
+  template:
+    metadata:
+      labels:
+        app: node
+    spec:
+      securityContext:
+        # owns mounted volume, see https://stackoverflow.com/a/43545277
+        fsGroup: 1001
+      containers:
+      - name: node
+        image: kryptokrauts/leap:v4.0.4
+        args:
+        # - --genesis-json
+        # - /opt/leap/config/genesis.json
+        - --snapshot
+        - /opt/leap/snapshots/latest.bin
+        - --disable-replay-opts
+        ports:
+        - containerPort: 8888
+          name: api
+          protocol: TCP
+        - containerPort: 9876
+          name: p2p
+          protocol: TCP
+        - containerPort: 8080
+          name: state-history
+          protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /v1/chain/get_info
+            port: 8888
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          successThreshold: 1
+          failureThreshold: 1
+          timeoutSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /v1/chain/get_info
+            port: 8888
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          successThreshold: 1
+          failureThreshold: 1
+          timeoutSeconds: 30
+        volumeMounts:
+        - name: node-volume
+          mountPath: /opt/leap
+        - name: node-config
+          mountPath: /opt/leap/config/config.ini
+          subPath: config.ini
+        # - name: node-config
+        #   mountPath: /opt/leap/config/genesis.json
+        #   subPath: genesis.json
+      initContainers:
+      - name: init-snapshot
+        image: busybox:1.36
+        command:
+        - /bin/sh
+        args:
+        - -c
+        - ./opt/scripts/get_snapshot.sh
+        volumeMounts:
+        - name: node-volume
+          mountPath: /opt/leap
+        - name: node-snapshot
+          mountPath: /opt/scripts/get_snapshot.sh
+          subPath: get_snapshot.sh
+      volumes:
+      - name: node-volume
+        persistentVolumeClaim:
+          claimName: node-volume
+      - name: node-config
+        configMap:
+          name: node-config
+      - name: node-snapshot
+        configMap:
+          name: node-snapshot
+          defaultMode: 0777

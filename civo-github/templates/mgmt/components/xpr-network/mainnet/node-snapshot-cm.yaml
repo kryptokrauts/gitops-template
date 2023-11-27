@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: node-snapshot
+data:
+  get_snapshot.sh: |-
+    #!/bin/sh
+
+    mkdir -p /opt/leap/snapshots
+    cd /opt/leap/snapshots
+    pwd
+    echo .* *
+
+    if [ ! -f ./latest.bin ]; then
+      echo "Snapshot not available. Fetching latest snapshot ..."
+      wget https://snapshots.eosusa.io/snapshots/proton/latest.tar.gz && tar -xvzf latest.tar.gz && rm latest.tar.gz && mv ./snapshot-*.bin ./latest.bin
+    else
+      echo "Snapshot available. Skip fetching snapshot."
+    fi
