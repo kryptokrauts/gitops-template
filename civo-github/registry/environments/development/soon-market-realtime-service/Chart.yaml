@@ -1,9 +1,9 @@
 apiVersion: v2
 dependencies:
-  - name: metaphor
+  - name: soon-market-realtime-service
     repository: http://chartmuseum.chartmuseum.svc.cluster.local:8080
     version: 0.0.1-rc.awaiting-ci
-description: metaphor example application
-name: metaphor
+description: soon-market realtime service
+name: soon-market-realtime-service
 type: application
 version: 1.0.0

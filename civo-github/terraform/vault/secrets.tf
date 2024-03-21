@@ -181,13 +181,7 @@ resource "random_password" "dev-postgres-read-access" {
   override_special = "!#$"
 }
 
-resource "random_password" "dev-postgres-soon-market-internal" {
-  length           = 32
-  special          = true
-  override_special = "!#$"
-}
-
-resource "random_password" "dev-postgres-soon-market-api" {
+resource "random_password" "dev-postgres-soon-market" {
   length           = 32
   special          = true
   override_special = "!#$"
@@ -212,8 +206,7 @@ resource "vault_generic_secret" "dev-postgres-passwords" {
     {
       postgres-password                 = random_password.dev-postgres-admin.result,
       PG_READ_ACCESS_PASSWORD           = random_password.dev-postgres-read-access.result,
-      PG_SOON_MARKET_INTERNAL_PASSWORD  = random_password.dev-postgres-soon-market-internal.result,
-      PG_SOON_MARKET_API_PASSWORD       = random_password.dev-postgres-soon-market-api.result,
+      PG_SOON_MARKET_PASSWORD           = random_password.dev-postgres-soon-market.result,
       PG_APICURIO_REGISTRY_PASSWORD     = random_password.dev-postgres-apicurio-registry.result,
       PG_SOONY_PASSWORD                 = random_password.dev-postgres-soony.result,
     }

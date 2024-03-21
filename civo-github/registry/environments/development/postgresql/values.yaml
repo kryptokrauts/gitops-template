@@ -6,4 +6,4 @@ postgresql:
       scriptsConfigMap: postgres-initdb
     extraEnvVarsSecret: postgres-secrets
 
-clusterSecretStoreName: <WORKLOAD_CLUSTER_NAME>-vault-kv-secret
+clusterSecretStoreName: vault-kv-secret

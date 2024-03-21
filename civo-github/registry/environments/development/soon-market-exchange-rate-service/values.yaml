@@ -1,0 +1,16 @@
+soon-market-exchange-rate-service:
+  application:
+    logLevel: info
+    port: 8181
+    typeorm:
+      connection: postgres
+      host: dev-postgresql.development.svc
+      port: 5432
+      username: SOON_MARKET
+      database: SOON_MARKET
+      synchronize: false
+      logging: false
+    exchangeRate:
+      intradayCron: 0 15,45 * * * *
+      interdayCron: 0 0 6,12,18 * * *
+      syncUrlCoingecko: https://api.coingecko.com/api/v3/coins/$asset/ohlc?vs_currency=$vscurrency&days=$days

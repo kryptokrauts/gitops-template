@@ -1,0 +1,12 @@
+auction-end-service:
+  application:
+    logLevel: INFO
+    kkLogLevel: DEBUG
+    connection:
+      url: jdbc:postgresql://dev-postgresql.development.svc:5432/SOON_MARKET
+      user: SOON_MARKET
+      remoteSecretProperty: PG_SOON_MARKET_PASSWORD
+    kafka:
+      brokers: dev-kafka-controller-headless.development.svc:9094
+      apicurioRegistryUrl: http://apicurio-registry.development.svc:8080/apis/registry/v2
+      auctionEndTopic: xpr-network.realtime.avro

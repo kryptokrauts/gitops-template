@@ -1,7 +1,7 @@
 # apiVersion: argoproj.io/v1alpha1
 # kind: Application
 # metadata:
-#   name: dev-example-event-processor
+#   name: dev-soon-market-exchange-rate-service
 #   namespace: argocd
 #   finalizers:
 #     - resources-finalizer.argocd.argoproj.io
@@ -11,10 +11,10 @@
 #   project: default
 #   source:
 #     repoURL: <GITOPS_REPO_URL>
-#     path: registry/environments/development/example-event-processor
+#     path: registry/environments/development/soon-market-exchange-rate-service
 #     targetRevision: HEAD
 #   destination:
-#     name: <WORKLOAD_CLUSTER_NAME>
+#     name: in-cluster
 #     namespace: development
 #   syncPolicy:
 #     automated:

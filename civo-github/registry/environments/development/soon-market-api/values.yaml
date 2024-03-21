@@ -1,6 +1,18 @@
 soon-market-api:
   application:
     logLevel: DEBUG
+    connection:
+      url: jdbc:postgresql://dev-postgresql.development.svc:5432/SOON_MARKET
+      user: SOON_MARKET
+      remoteSecretProperty: PG_SOON_MARKET_PASSWORD
+    cache:
+      refreshExchangeRates: PT10m
+      refreshProfiles: PT1h
+      refreshShieldedCollections: PT1h
+      refreshMarketConfig: P1d
+      refreshSupportedAssets: P1d
+    defaultCollectionBanner: https://media.soon.market/images/banner_placeholder.avif
+    collectionSocialsPrefixes: 'website:,twitter:,telegram:,instagram:,youtube:,youtube_video_link:,discord:,snipverse:,facebook:,linkedIn:,tikTok:,snipcoins:,medium:'
   ingress:
     className: nginx
     annotations:
@@ -17,3 +29,4 @@ soon-market-api:
     - secretName: soon-market-api-tls
       hosts:
       - soon-market-api.dev.<DOMAIN_NAME>
+  clusterSecretStoreName: vault-kv-secret

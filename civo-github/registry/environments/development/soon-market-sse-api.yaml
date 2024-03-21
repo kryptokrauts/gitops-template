@@ -1,17 +1,17 @@
 # apiVersion: argoproj.io/v1alpha1
 # kind: Application
 # metadata:
-#   name: dev-postgresql
+#   name: dev-soon-market-sse-api
 #   namespace: argocd
 #   finalizers:
-#   - resources-finalizer.argocd.argoproj.io
+#     - resources-finalizer.argocd.argoproj.io
 #   annotations:
 #     argocd.argoproj.io/sync-wave: '45'
 # spec:
 #   project: default
 #   source:
 #     repoURL: <GITOPS_REPO_URL>
-#     path: registry/environments/development/postgresql
+#     path: registry/environments/development/soon-market-sse-api
 #     targetRevision: HEAD
 #   destination:
 #     name: in-cluster
@@ -21,4 +21,4 @@
 #       prune: true
 #       selfHeal: true
 #     syncOptions:
-#     - CreateNamespace=true
+#       - CreateNamespace=true

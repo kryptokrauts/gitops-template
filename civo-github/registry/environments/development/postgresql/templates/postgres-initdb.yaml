@@ -27,8 +27,7 @@ data:
     function create_databases_and_grant_privileges() {
       local DATABASES=(
         "APICURIO_REGISTRY"
-        "SOON_MARKET_INTERNAL"
-        "SOON_MARKET_API"
+        "SOON_MARKET"
         "SOONY")
 
       echo "Creating ${#DATABASES[@]} databases"

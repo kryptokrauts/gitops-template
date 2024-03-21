@@ -1,0 +1,8 @@
+apiVersion: v2
+dependencies:
+  - name: atomicassets-event-processor
+    repository: http://chartmuseum.chartmuseum.svc.cluster.local:8080
+    version: 0.0.1-rc.awaiting-ci
+description: atomicassets-event-processor
+name: atomicassets-event-processor
+version: 1.0.0

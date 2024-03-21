@@ -1,8 +1,8 @@
 apiVersion: v2
 dependencies:
-  - name: example-event-processor
+  - name: atomicmarket-event-processor
     repository: http://chartmuseum.chartmuseum.svc.cluster.local:8080
     version: 0.0.1-rc.awaiting-ci
-description: example-event-processor
-name: example-event-processor
+description: atomicmarket-event-processor
+name: atomicmarket-event-processor
 version: 1.0.0

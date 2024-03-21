@@ -1,5 +1,5 @@
-example-event-processor:
-  namePrefix: example
+atomicmarket-event-processor:
+  namePrefix: atomicmarket
 
   common:
     kafkaBrokers: dev-kafka-controller-headless.development.svc:9094
@@ -7,41 +7,40 @@ example-event-processor:
     apicurioRegistryUrl: http://apicurio-registry.development.svc:8080/apis/registry/v2
 
   eventProcessorContract:
-    name: dev-example-event-processor-contract
     image:
-      repository: <CONTAINER_REGISTRY_URL>/example-event-processor-contract
+      repository: ghcr.io/kryptokrauts/atomicmarket-event-processor-contract
       pullPolicy: IfNotPresent
     replicaCount: 1
     configMapEnv:
       outgoingStructuredTopic: xpr-network.atomicmarket.avro
+      outgoingRealtimeTopic: xpr-network.realtime.avro
       kafkaContractConsumerGroupId: xpr-network.atomicmarket.raw.contract.consumers
 
   eventProcessorNode:
-    name: dev-example-event-processor-node
     image:
-      repository: <CONTAINER_REGISTRY_URL>/example-event-processor-node
+      repository: ghcr.io/kryptokrauts/atomicmarket-event-processor-node
       pullPolicy: IfNotPresent
     replicaCount: 1
     configMapEnv:
+      # app
+      logLevel: trace
       # node
       nodeApi: http://node.xpr-network-mainnet.svc:8888
       shipApi: ws://node.xpr-network-mainnet.svc:8080
-      startBlock: 226012662
+      startBlock: 246279500
       # kafka
       kafkaLogLevel: 1
       kafkaClientId: xpr-network.atomicmarket.raw.producer
       kakaConnectionTimeout: 3000
-      kafkaForkTopic: xpr-network.fork.avro
-      kafkaForkConsumerGroupId: xpr-network.fork.avro.atomicmarket.node.consumers
       kafkaContractConsumerGroupId: xpr-network.atomicmarket.raw.node.consumers
 
   sinkConnector:
-    clusterSecretStoreName: <WORKLOAD_CLUSTER_NAME>-vault-kv-secret
+    clusterSecretStoreName: vault-kv-secret
     postgresSecretPath: development/postgres
     kafkaConnectEndpoint: http://kafka-connect.development.svc:8083/connectors
     connection:
-      url: jdbc:postgresql://dev-postgresql.development.svc:5432/SOON_MARKET_INTERNAL
-      user: SOON_MARKET_INTERNAL
+      url: jdbc:postgresql://dev-postgresql.development.svc:5432/SOON_MARKET
+      user: SOON_MARKET
 
   imagePullSecrets:
     - name: docker-config
@@ -49,4 +48,3 @@ example-event-processor:
   nodeSelector: {}
   tolerations: []
   affinity: {}
-

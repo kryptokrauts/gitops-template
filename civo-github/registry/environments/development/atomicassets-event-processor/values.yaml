@@ -1,0 +1,50 @@
+atomicassets-event-processor:
+  namePrefix: atomicassets
+
+  common:
+    kafkaBrokers: dev-kafka-controller-headless.development.svc:9094
+    kafkaContractTopic: xpr-network.atomicassets.raw
+    apicurioRegistryUrl: http://apicurio-registry.development.svc:8080/apis/registry/v2
+
+  eventProcessorContract:
+    image:
+      repository: ghcr.io/kryptokrauts/atomicassets-event-processor-contract
+      pullPolicy: IfNotPresent
+    replicaCount: 1
+    configMapEnv:
+      outgoingStructuredTopic: xpr-network.atomicassets.avro
+      outgoingRealtimeTopic: xpr-network.realtime.avro
+      kafkaContractConsumerGroupId: xpr-network.atomicassets.raw.contract.consumers
+
+  eventProcessorNode:
+    image:
+      repository: ghcr.io/kryptokrauts/atomicassets-event-processor-node
+      pullPolicy: IfNotPresent
+    replicaCount: 1
+    configMapEnv:
+      # app
+      logLevel: trace
+      # node
+      nodeApi: http://node.xpr-network-mainnet.svc:8888
+      shipApi: ws://node.xpr-network-mainnet.svc:8080
+      startBlock: 246285900
+      # kafka
+      kafkaLogLevel: 1
+      kafkaClientId: xpr-network.atomicassets.raw.producer
+      kakaConnectionTimeout: 3000
+      kafkaContractConsumerGroupId: xpr-network.atomicassets.raw.node.consumers
+
+  sinkConnector:
+    clusterSecretStoreName: vault-kv-secret
+    postgresSecretPath: development/postgres
+    kafkaConnectEndpoint: http://kafka-connect.development.svc:8083/connectors
+    connection:
+      url: jdbc:postgresql://dev-postgresql.development.svc:5432/SOON_MARKET
+      user: SOON_MARKET
+
+  imagePullSecrets:
+    - name: docker-config
+
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}

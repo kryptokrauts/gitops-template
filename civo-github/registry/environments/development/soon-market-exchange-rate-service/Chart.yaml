@@ -1,0 +1,9 @@
+apiVersion: v2
+dependencies:
+  - name: soon-market-exchange-rate-service
+    repository: http://chartmuseum.chartmuseum.svc.cluster.local:8080
+    version: 1.0.0-rc.awaiting-ci
+description: soon-market exchange rate service
+name: soon-market-exchange-rate-service
+type: application
+version: 1.0.0

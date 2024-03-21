@@ -1,0 +1,31 @@
+soon-market-sse-api:
+  application:
+    logLevel: INFO
+    kkLogLevel: DEBUG
+    sseKeepaliveInterval: 30
+    connection:
+      url: jdbc:postgresql://dev-postgresql.development.svc:5432/SOON_MARKET
+      user: SOON_MARKET
+      remoteSecretProperty: PG_SOON_MARKET_PASSWORD
+    kafka:
+      brokers: dev-kafka-controller-headless.development.svc:9094
+      apicurioRegistryUrl: http://apicurio-registry.development.svc:8080/apis/registry/v2
+      realtimeTopic: xpr-network.realtime.processed.avro
+      realtimeConsumerGroupId: xpr-network.realtime.processed.avro.api.consumers
+  ingress:
+    className: nginx
+    annotations:
+      <CERT_MANAGER_ISSUER_ANNOTATION_1>
+      <CERT_MANAGER_ISSUER_ANNOTATION_2>
+      <CERT_MANAGER_ISSUER_ANNOTATION_3>
+      <CERT_MANAGER_ISSUER_ANNOTATION_4>
+    hosts:
+    - host: soon-market-sse-api.dev.<DOMAIN_NAME>
+      paths:
+      - path: /
+        pathType: Prefix
+    tls:
+    - secretName: soon-market-sse-api-tls
+      hosts:
+      - soon-market-sse-api.dev.<DOMAIN_NAME>
+  clusterSecretStoreName: vault-kv-secret
