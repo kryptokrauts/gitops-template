@@ -1,4 +1,0 @@
-apiVersion: v2
-description: Helm chart for running an IPFS gateway incl. resizer
-name: ipfs-gateway
-version: 0.0.1
