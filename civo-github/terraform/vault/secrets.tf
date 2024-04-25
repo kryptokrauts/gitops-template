@@ -72,7 +72,7 @@ resource "vault_generic_secret" "metaphor" {
   # do not hardcode passwords in git under normal circumstances.
   data_json = jsonencode(
     {
-      SECRET_ONE = "${each.key} secret 1"
+      SECRET_ONE = "${each.key} secret 1",
       SECRET_TWO = "${each.key} secret 2"
     }
   )
