@@ -1,6 +1,6 @@
 terraform {
   backend "s3" {
-    endpoint ="https://nyc3.digitaloceanspaces.com"
+    endpoint = "nyc3.digitaloceanspaces.com"
     key      = "terraform/digitalocean/terraform.tfstate"
     bucket   = "<KUBEFIRST_STATE_STORE_BUCKET>"
     // Don't change this.
@@ -8,6 +8,8 @@ terraform {
 
     skip_credentials_validation = true
     skip_metadata_api_check     = true
+    skip_region_validation      = true
+    force_path_style            = true
   }
   required_providers {
     digitalocean = {
@@ -28,12 +30,11 @@ provider "digitalocean" {
 locals {
   cluster_name         = "<CLUSTER_NAME>"
   pool_name            = "${local.cluster_name}-node-pool"
-  pool_instance_size   = "s-4vcpu-8gb"
   kube_config_filename = "../../../kubeconfig"
 }
 
 data "digitalocean_kubernetes_versions" "versions" {
-  version_prefix = "1.26."
+  version_prefix = "1.27."
 }
 
 resource "digitalocean_kubernetes_cluster" "kubefirst" {
@@ -43,8 +44,8 @@ resource "digitalocean_kubernetes_cluster" "kubefirst" {
 
   node_pool {
     name       = local.pool_name
-    size       = local.pool_instance_size
-    node_count = 4
+    size       = "<NODE_TYPE>"
+    node_count = tonumber("<NODE_COUNT>") # tonumber() is used for a string token value
   }
 }
 

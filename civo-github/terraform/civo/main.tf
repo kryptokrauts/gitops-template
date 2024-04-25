@@ -16,11 +16,11 @@ terraform {
       source = "civo/civo"
     }
     kubernetes = {
-      source = "hashicorp/kubernetes"
+      source  = "hashicorp/kubernetes"
       version = "2.23.0"
     }
     vault = {
-      source = "hashicorp/vault"
+      source  = "hashicorp/vault"
       version = "3.19.0"
     }
   }
@@ -30,7 +30,7 @@ provider "civo" {
 }
 
 locals {
-  cluster_name = "<CLUSTER_NAME>"
+  cluster_name         = "<CLUSTER_NAME>"
   kube_config_filename = "../../../kubeconfig"
 }
 
@@ -48,10 +48,11 @@ resource "civo_kubernetes_cluster" "kubefirst" {
   name        = local.cluster_name
   network_id  = civo_network.kubefirst.id
   firewall_id = civo_firewall.kubefirst.id
+  cluster_type = "talos"
   pools {
     label      = local.cluster_name
-    size       = "g4s.kube.medium"
-    node_count = 6
+    size       = "<NODE_TYPE>"
+    node_count = tonumber("<NODE_COUNT>") # tonumber() is used for a string token value
   }
 }
 

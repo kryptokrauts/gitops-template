@@ -41,16 +41,16 @@ module "gke" {
   // Node Pools
   node_pools = [
     {
-      name         = "kubefirst"
-      machine_type = var.instance_type
+      name      = "kubefirst"
+      node_type = var.instance_type
 
       // Autoscaling
       // PER ZONE
-      min_count = 2
+      min_count = tonumber("<NODE_COUNT>") # tonumber() is used for a string token value
       // PER ZONE
-      max_count = 3
+      max_count = tonumber("<NODE_COUNT>") # tonumber() is used for a string token value
       // PER ZONE
-      initial_node_count = 2
+      initial_node_count = tonumber("<NODE_COUNT>") # tonumber() is used for a string token value
 
       local_ssd_count = 0
       spot            = false

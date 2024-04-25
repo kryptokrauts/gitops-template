@@ -42,10 +42,11 @@ resource "civo_kubernetes_cluster" "kubefirst" {
   name        = local.cluster_name
   network_id  = civo_network.kubefirst.id
   firewall_id = civo_firewall.kubefirst.id
+  cluster_type = "talos"
   pools {
     label      = local.cluster_name
-    size       = "g4s.kube.medium"
-    node_count = 4
+    size       = "<NODE_TYPE>"
+    node_count = tonumber("<NODE_COUNT>") # tonumber() is used for a string token value
   }
 }
 

@@ -4,17 +4,16 @@ metadata:
   name: kubefirst
   namespace: argocd
   annotations:
-    argocd.argoproj.io/sync-wave: '10'
+    argocd.argoproj.io/sync-wave: "10"
 spec:
   project: default
   source:
     repoURL: https://charts.kubefirst.com
-    targetRevision: 2.3.5
+    targetRevision: 2.4.6-rc1
     chart: kubefirst
     helm:
       values: |-
         global:
-          kubefirstVersion: "<KUBEFIRST_VERSION>"
           cloudProvider: "<CLOUD_PROVIDER>"
           clusterId: "<CLUSTER_ID>"
           clusterType: "<CLUSTER_TYPE>"
@@ -24,26 +23,22 @@ spec:
           kubefirstClient: "<KUBEFIRST_CLIENT>"
           kubefirstTeam: "<KUBEFIRST_TEAM>"
           kubefirstTeamInfo: "<KUBEFIRST_TEAM_INFO>"
+          kubefirstVersion: "<KUBEFIRST_VERSION>"
           useTelemetry: "<USE_TELEMETRY>"
         kubefirst-api-ee:
-          env:
-            - name: IN_CLUSTER
-              value: "'true'"
+          extraEnv:
+            IN_CLUSTER: "true"
         kubefirst-api:
-          isClusterZero: "'false'"
-          env:
-            - name: IN_CLUSTER
-              value: "'true'"
-            - name: CLUSTER_NAME
-              value: "<CLUSTER_NAME>"
-            - name: ENTERPRISE_API_URL
-              value: "http://kubefirst-kubefirst-api-ee.kubefirst.svc.cluster.local"
+          isClusterZero: "false"
+          extraEnv:
+            IN_CLUSTER: "true"
+            CLUSTER_NAME: "<CLUSTER_NAME>"
+            ENTERPRISE_API_URL: "http://kubefirst-kubefirst-api-ee.kubefirst.svc.cluster.local"
         console:
-          isClusterZero: "'false'"
+          isClusterZero: "false"
           domain: "<DOMAIN_NAME>"
-          env:
-            DISABLE_AUTH:
-              value: "true"
+          extraEnv:
+            DISABLE_AUTH: "true"
           extraEnvSecrets:
             CLIENT_ID:
               name: kubefirst-console-secrets

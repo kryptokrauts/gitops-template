@@ -22,8 +22,8 @@ spec:
               cpu: 1
               memory: 1024Mi
         server:
+          secure: false
           extraArgs:
-          - --secure
           - --auth-mode=client
           - --auth-mode=sso
           ingress:
@@ -74,7 +74,7 @@ spec:
               key: secretkey
             insecure: false
             bucket: <KUBEFIRST_STATE_STORE_BUCKET>
-            endpoint: https://nyc3.digitaloceanspaces.com
+            endpoint: nyc3.digitaloceanspaces.com
             region: <CLOUD_REGION>
             useSDKCreds: false
             encryptionOptions:
