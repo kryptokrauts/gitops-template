@@ -51,7 +51,7 @@ resource "civo_kubernetes_cluster" "kubefirst" {
   pools {
     label      = local.cluster_name
     size       = "g4s.kube.medium"
-    node_count = 8
+    node_count = 6
   }
 }
 
