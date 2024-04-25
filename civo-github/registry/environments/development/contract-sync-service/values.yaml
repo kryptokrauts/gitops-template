@@ -1,12 +1,17 @@
-auction-end-service:
+contract-sync-service:
   application:
-    logLevel: INFO
+    logLevel: DEBUG
     kkLogLevel: DEBUG
+    dbReadRetryMaxAttempts: 100
+    dbReadRetryInterval: 50
     connection:
       url: jdbc:postgresql://dev-postgresql.development.svc:5432/SOON_MARKET
       user: SOON_MARKET
       remoteSecretProperty: PG_SOON_MARKET_PASSWORD
     kafka:
       brokers: dev-kafka-controller-headless.development.svc:9094
+      connectEndpoint: http://kafka-connect.development.svc:8083/connectors
       apicurioRegistryUrl: http://apicurio-registry.development.svc:8080/apis/registry/v2
-      auctionEndTopic: xpr-network.realtime.avro
+      eventlogTopic: xpr-network.eventlog.avro
+      eventlogConsumerGroupId: xpr-network.eventlog.avro.sync.consumers
+  clusterSecretStoreName: vault-kv-secret

@@ -1,0 +1,24 @@
+# apiVersion: argoproj.io/v1alpha1
+# kind: Application
+# metadata:
+#   name: dev-audit-event-processor
+#   namespace: argocd
+#   finalizers:
+#     - resources-finalizer.argocd.argoproj.io
+#   annotations:
+#     argocd.argoproj.io/sync-wave: '50'
+# spec:
+#   project: default
+#   source:
+#     repoURL: <GITOPS_REPO_URL>
+#     path: registry/environments/development/audit-event-processor
+#     targetRevision: HEAD
+#   destination:
+#     name: in-cluster
+#     namespace: development
+#   syncPolicy:
+#     automated:
+#       prune: true
+#       selfHeal: true
+#     syncOptions:
+#       - CreateNamespace=true

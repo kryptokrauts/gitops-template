@@ -1,0 +1,8 @@
+apiVersion: v2
+dependencies:
+  - name: promotion-event-processor
+    repository: http://chartmuseum.chartmuseum.svc.cluster.local:8080
+    version: 0.0.1-rc.awaiting-ci
+description: promotion-event-processor
+name: promotion-event-processor
+version: 1.0.0

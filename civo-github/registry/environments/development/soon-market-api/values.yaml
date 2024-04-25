@@ -11,8 +11,11 @@ soon-market-api:
       refreshShieldedCollections: PT1h
       refreshMarketConfig: P1d
       refreshSupportedAssets: P1d
-    defaultCollectionBanner: https://media.soon.market/images/banner_placeholder.avif
     collectionSocialsPrefixes: 'website:,twitter:,telegram:,instagram:,youtube:,youtube_video_link:,discord:,snipverse:,facebook:,linkedIn:,tikTok:,snipcoins:,medium:'
+    spots:
+      collectionId: '323154322551'
+      goldAssetId: '4398046764318'
+      silverTemplateId: '51066'
   ingress:
     className: nginx
     annotations:

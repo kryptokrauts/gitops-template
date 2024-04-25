@@ -1,0 +1,20 @@
+scheduled-task-service:
+  application:
+    logLevel: INFO
+    kkLogLevel: DEBUG
+    connection:
+      url: jdbc:postgresql://dev-postgresql.development.svc:5432/SOON_MARKET
+      user: SOON_MARKET
+      remoteSecretProperty: PG_SOON_MARKET_PASSWORD
+    defaultTransactionTimeout: 120s
+    scheduler:
+      metricsEnabled: true
+      startMode: forced
+    task:
+      delaySeconds: 30
+      matview:
+        collectionStats: PT10m
+        collectionHolder: PT10m
+        collectionStats7d: PT30m
+        collectionStats30d: PT1h
+        collectionStats180d: PT1h

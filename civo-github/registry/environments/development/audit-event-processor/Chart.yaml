@@ -1,0 +1,8 @@
+apiVersion: v2
+dependencies:
+  - name: audit-event-processor
+    repository: http://chartmuseum.chartmuseum.svc.cluster.local:8080
+    version: 0.0.1-rc.awaiting-ci
+description: audit-event-processor
+name: audit-event-processor
+version: 1.0.0

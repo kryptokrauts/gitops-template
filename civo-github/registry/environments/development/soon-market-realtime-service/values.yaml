@@ -2,8 +2,8 @@ soon-market-realtime-service:
   application:
     logLevel: INFO
     kkLogLevel: DEBUG
-    dbReadRetryMaxAttempts: 12
-    dbReadRetryInterval: 5
+    dbReadRetryMaxAttempts: 50
+    dbReadRetryInterval: 250
     connection:
       url: jdbc:postgresql://dev-postgresql.development.svc:5432/SOON_MARKET
       user: SOON_MARKET

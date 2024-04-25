@@ -10,11 +10,11 @@ soon-market-ui:
       <CERT_MANAGER_ISSUER_ANNOTATION_4>
       nginx.ingress.kubernetes.io/service-upstream: "true"
     hosts:
-    - host: soon-market-ui.dev.<DOMAIN_NAME>
+    - host: beta.<DOMAIN_NAME>
       paths:
       - path: /
         pathType: Prefix
     tls:
-    - secretName: soon-market-ui-tls
+    - secretName: beta-tls
       hosts:
-      - soon-market-ui.dev.<DOMAIN_NAME>
+      - beta.<DOMAIN_NAME>

@@ -38,9 +38,16 @@ kafka:
     enabled: true
     replicationFactor: 2
     topics:
-      - name: xpr-network.fork.avro
+      - name: xpr-network.realtime.avro
+      - name: xpr-network.eventlog.avro
       - name: xpr-network.atomicmarket.raw
       - name: xpr-network.atomicmarket.avro
+      - name: xpr-network.atomicassets.raw
+      - name: xpr-network.atomicassets.avro
+      - name: xpr-network.audit.raw
+      - name: xpr-network.audit.avro
+      - name: xpr-network.promotion.raw
+      - name: xpr-network.promotion.avro
 
 kafkaConnect:
   image:

@@ -1,9 +1,9 @@
 apiVersion: v2
 dependencies:
-  - name: auction-end-service
+  - name: contract-sync-service
     repository: http://chartmuseum.chartmuseum.svc.cluster.local:8080
     version: 0.0.1-rc.awaiting-ci
-description: auction-end-service
-name: auction-end-service
+description: contract sync service
+name: contract-sync-service
 type: application
 version: 1.0.0

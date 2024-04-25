@@ -1,52 +1,58 @@
-atomicmarket-event-processor:
-  namePrefix: atomicmarket
+promotion-event-processor:
+  namePrefix: promotion
 
   common:
     kafkaBrokers: dev-kafka-controller-headless.development.svc:9094
-    kafkaContractTopic: xpr-network.atomicmarket.raw
+    kafkaContractTopic: xpr-network.promotion.raw
     apicurioRegistryUrl: http://apicurio-registry.development.svc:8080/apis/registry/v2
-    connection:
-      url: jdbc:postgresql://dev-postgresql.development.svc:5432/SOON_MARKET
-      user: SOON_MARKET
-    clusterSecretStoreName: vault-kv-secret
-    postgresSecretPath: development/postgres
 
   eventProcessorContract:
     image:
-      repository: ghcr.io/kryptokrauts/atomicmarket-event-processor-contract
+      repository: ghcr.io/kryptokrauts/promotion-event-processor-contract
       pullPolicy: IfNotPresent
     replicaCount: 1
     configMapEnv:
-      outgoingStructuredTopic: xpr-network.atomicmarket.avro
-      outgoingRealtimeTopic: xpr-network.realtime.avro
-      outgoingEventlogTopic: xpr-network.eventlog.avro
-      kafkaContractConsumerGroupId: xpr-network.atomicmarket.raw.contract.consumers
+      outgoingStructuredTopic: xpr-network.promotion.avro
+      kafkaContractConsumerGroupId: xpr-network.promotion.raw.contract.consumers
+    logLevel: INFO
+    kkLogLevel: DEBUG
 
   eventProcessorNode:
     image:
-      repository: ghcr.io/kryptokrauts/atomicmarket-event-processor-node
+      repository: ghcr.io/kryptokrauts/promotion-event-processor-node
       pullPolicy: IfNotPresent
+    cpu:
+      request: 0.2
+      limit: 1
+    memory:
+      request: 200M
+      limit: 1G
     replicaCount: 1
     configMapEnv:
       # app
-      logLevel: trace
+      logLevel: info
       # node
       # nodeApi: http://node.xpr-network-mainnet.svc:8888
       # shipApi: ws://node.xpr-network-mainnet.svc:8080
       nodeApi: https://proton.eosusa.io
       shipApi: ws://65.108.12.246:8080
-      startBlock: 252147845
+      startBlock: 252569541
       dsThreads: 2
       numBlocksToFinality: 360
       irreversibleBlocksOnly: false
       # kafka
       kafkaLogLevel: 1
-      kafkaClientId: xpr-network.atomicmarket.raw.producer
+      kafkaClientId: xpr-network.promotion.raw.producer
       kakaConnectionTimeout: 3000
-      kafkaContractConsumerGroupId: xpr-network.atomicmarket.raw.node.consumers
+      kafkaContractConsumerGroupId: xpr-network.promotion.raw.node.consumers
 
   sinkConnector:
+    clusterSecretStoreName: vault-kv-secret
+    postgresSecretPath: development/postgres
     kafkaConnectEndpoint: http://kafka-connect.development.svc:8083/connectors
+    connection:
+      url: jdbc:postgresql://dev-postgresql.development.svc:5432/SOON_MARKET
+      user: SOON_MARKET
 
   imagePullSecrets:
     - name: docker-config

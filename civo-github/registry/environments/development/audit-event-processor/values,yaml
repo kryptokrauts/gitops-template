@@ -1,44 +1,49 @@
-atomicassets-event-processor:
-  namePrefix: atomicassets
-
+audit-event-processor:
   common:
     kafkaBrokers: dev-kafka-controller-headless.development.svc:9094
-    kafkaContractTopic: xpr-network.atomicassets.raw
+    kafkaContractTopic: xpr-network.audit.raw
     apicurioRegistryUrl: http://apicurio-registry.development.svc:8080/apis/registry/v2
 
   eventProcessorContract:
     image:
-      repository: ghcr.io/kryptokrauts/atomicassets-event-processor-contract
+      repository: ghcr.io/kryptokrauts/audit-event-processor-contract
       pullPolicy: IfNotPresent
     replicaCount: 1
     configMapEnv:
-      outgoingStructuredTopic: xpr-network.atomicassets.avro
-      outgoingRealtimeTopic: xpr-network.realtime.avro
-      outgoingEventlogTopic: xpr-network.eventlog.avro
-      kafkaContractConsumerGroupId: xpr-network.atomicassets.raw.contract.consumers
+      outgoingStructuredTopic: xpr-network.audit.avro
+      kafkaContractConsumerGroupId: xpr-network.audit.raw.contract.consumers
+    logLevel: INFO
+    kkLogLevel: DEBUG
 
   eventProcessorNode:
     image:
-      repository: ghcr.io/kryptokrauts/atomicassets-event-processor-node
+      repository: ghcr.io/kryptokrauts/audit-event-processor-node
       pullPolicy: IfNotPresent
+    # cpu:
+    #   request: 1
+    #   limit: 2
+    # memory:
+    #   request: 1G
+    #   limit: 8G
     replicaCount: 1
     configMapEnv:
       # app
       logLevel: trace
-      # node
       # nodeApi: http://node.xpr-network-mainnet.svc:8888
       # shipApi: ws://node.xpr-network-mainnet.svc:8080
       nodeApi: https://proton.eosusa.io
       shipApi: ws://65.108.12.246:8080
-      startBlock: 252147845
+      startBlock: 252488220
       dsThreads: 2
-      numBlocksToFinality: 360
-      irreversibleBlocksOnly: false
+      maxMessagesInFlight: 50
+      fetchBlock: true
+      fetchTraces: true
+      fetchDeltas: false
       # kafka
       kafkaLogLevel: 1
-      kafkaClientId: xpr-network.atomicassets.raw.producer
+      kafkaClientId: xpr-network.audit.raw.producer
       kakaConnectionTimeout: 3000
-      kafkaContractConsumerGroupId: xpr-network.atomicassets.raw.node.consumers
+      kafkaContractConsumerGroupId: xpr-network.audit.raw.node.consumers
 
   sinkConnector:
     clusterSecretStoreName: vault-kv-secret
@@ -51,6 +56,12 @@ atomicassets-event-processor:
   imagePullSecrets:
     - name: docker-config
 
-  nodeSelector: {}
-  tolerations: []
-  affinity: {}
+  ## use workflow node temporarily
+  # nodeSelector:
+  #   purpose: workflows
+  # tolerations:
+  #   - key: "workflow-executor"
+  #     operator: "Equal"
+  #     value: "true"
+  #     effect: "NoSchedule"
+  # affinity: {}
