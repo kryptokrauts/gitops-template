@@ -170,7 +170,7 @@ resource "random_password" "dev-postgres-soony" {
 }
 
 resource "vault_generic_secret" "dev-postgres-passwords" {
-  path = "secret/development/postgres"
+  path = "${vault_mount.secret.path}/development/postgres"
 
   data_json = jsonencode(
     {
@@ -181,8 +181,6 @@ resource "vault_generic_secret" "dev-postgres-passwords" {
       PG_SOONY_PASSWORD                 = random_password.dev-postgres-soony.result,
     }
   )
-
-  depends_on = [vault_mount.secret]
 }
 
 resource "random_password" "pgadmin" {
@@ -192,15 +190,13 @@ resource "random_password" "pgadmin" {
 }
 
 resource "vault_generic_secret" "pgadmin-secrets" {
-  path = "secret/pgadmin"
+  path = "${vault_mount.secret.path}/pgadmin"
 
   data_json = jsonencode(
     {
       pgadmin-password = random_password.pgadmin.result,
     }
   )
-
-  depends_on = [vault_mount.secret]
 }
 
 resource "random_password" "grafana-admin" {
@@ -211,7 +207,7 @@ resource "random_password" "grafana-admin" {
 
 
 resource "vault_generic_secret" "grafana-secrets" {
-  path = "secret/monitoring/grafana"
+  path = "${vault_mount.secret.path}/monitoring/grafana"
 
   data_json = jsonencode(
     {
@@ -219,6 +215,4 @@ resource "vault_generic_secret" "grafana-secrets" {
       admin-password = random_password.grafana-admin.result,
     }
   )
-
-  depends_on = [vault_mount.secret]
 }
